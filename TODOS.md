@@ -2,13 +2,14 @@
 
 ## Front-end
 
-- [ ] Set up project structure with Svelte (SvelteKit?).
+- [x] Set up project structure with Svelte (SvelteKit?).
 - [ ] Design and create the user interface for the recipe browsing page.
 - [ ] Implement user registration and login forms.
 - [ ] Create the recipe details page with all the necessary information.
 - [ ] Implement the functionality to save recipes as favorites.
 - [ ] Design and implement the user profile page.
 - [ ] Ensure the application is responsive and works well on different devices.
+- [ ] Set up unit testing and E2E tests
 
 ### Pages
 
@@ -35,7 +36,7 @@
 
 ## Back-end
 
-- [ ] Set up a rocket.rs server
+- [x] Set up a rocket.rs server
 - [ ] Choose a suitable database system (e.g., MongoDB, PostgreSQL, MySQL).
 - [ ] Design the database schema for recipes, users, and comments.
 - [ ] Implement user authentication and authorization.
