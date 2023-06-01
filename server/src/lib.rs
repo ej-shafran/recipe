@@ -12,3 +12,8 @@ pub struct Recipe {
     pub content: String,
 }
 
+#[derive(Debug)]
+pub struct Comment {
+    pub id: u32,
+    pub content: String,
+}
