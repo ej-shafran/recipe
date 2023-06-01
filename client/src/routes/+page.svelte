@@ -1,2 +1,18 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script lang="ts">
+	const routes = [
+		"/browse",
+		"/register",
+		"/login",
+		"/recipe/:id",
+		"/user/:id/profile",
+		"/user/:id"
+	];
+</script>
+
+<h1>Recipe Website</h1>
+
+{#each routes as route}
+	<a href={route}>{route}</a>
+  <br />
+{/each}
+
