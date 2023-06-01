@@ -37,7 +37,7 @@
 ## Back-end
 
 - [x] Set up a rocket.rs server
-- [ ] Choose a suitable database system (e.g., MongoDB, PostgreSQL, MySQL).
+- [x] Choose a suitable database system (e.g., MongoDB, PostgreSQL, MySQL).
 - [ ] Design the database schema for recipes, users, and comments.
 - [ ] Implement user authentication and authorization.
 - [ ] Create RESTful API endpoints for recipe CRUD operations.
