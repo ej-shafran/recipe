@@ -12,7 +12,7 @@ pub mod user;
 pub struct DB(sqlx::MySqlPool);
 
 #[get("/")]
-pub async fn index(mut conn: Connection<DB>) -> String {
+async fn index(mut conn: Connection<DB>) -> String {
     sqlx::query!("SELECT 'Hello, world!' as result;")
         .fetch_one(&mut *conn)
         .await

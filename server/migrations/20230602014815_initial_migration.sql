@@ -2,7 +2,7 @@
 CREATE TABLE `user` (
   id varchar(36) PRIMARY KEY,
   username varchar(100),
-  password varchar(100)
+  password varchar(150)
 );
 
 CREATE TABLE `recipe` (
