@@ -38,14 +38,13 @@
 
 - [x] Set up a rocket.rs server
 - [x] Choose a suitable database system (e.g., MongoDB, PostgreSQL, MySQL).
-- [ ] Design the database schema for recipes, users, and comments.
+- [x] Set up the database connection and ensure it works with the backend.
+- [x] Design the database schema for recipes, users, and comments.
 - [ ] Implement user authentication and authorization.
 - [ ] Create RESTful API endpoints for recipe CRUD operations.
 - [ ] Write unit tests for the backend functionality.
-- [ ] Set up database connectivity and integrate an ORM or query builder.
 - [ ] Implement API endpoints for user actions like saving favorites and leaving comments.
 - [ ] Add validation and error handling to the API endpoints.
-- [ ] Set up the database connection and ensure it works with the backend.
 - [ ] Create indexes and optimize queries for performance.
 
 ## User Experience
