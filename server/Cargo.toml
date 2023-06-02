@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 rocket = "=0.5.0-rc.3"
-# sqlx = { version = "0.6", features = [ "runtime-tokio-native-tls", "mysql" ] }
+rocket_db_pools = { version = "=0.1.0-rc.3", features = ["sqlx_mysql"] }
+sqlx = { version = "0.6", features = [ "macros" ], default-features = false }
+dotenvy = "0.15"
