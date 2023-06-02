@@ -1,10 +1,11 @@
 #[macro_use]
 extern crate rocket;
 
-use rocket::{Build, Rocket};
+use rocket::fairing::AdHoc;
 use rocket_db_pools::{Connection, Database};
 
 pub mod schema;
+pub mod user;
 
 #[derive(Database)]
 #[database("recipe_db")]
@@ -20,12 +21,22 @@ pub async fn index(mut conn: Connection<DB>) -> String {
 }
 
 #[launch]
-pub fn rocket() -> Rocket<Build> {
+pub fn rocket() -> _ {
     dotenvy::dotenv().expect("cannot find dotenv file");
 
     rocket::build()
         .mount("/api", routes![index])
         .attach(DB::init())
+        .attach(AdHoc::try_on_ignite("Run migrations", |rocket| async {
+            if let Some(db) = DB::fetch(&rocket) {
+                if let Err(_) = sqlx::migrate!().run(&db.0).await {
+                    return Err(rocket);
+                }
+                Ok(rocket)
+            } else {
+                Err(rocket)
+            }
+        }))
 }
 
 #[cfg(test)]
