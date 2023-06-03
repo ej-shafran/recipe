@@ -1,7 +1,7 @@
 -- Add migration script here
 CREATE TABLE `user` (
   id varchar(36) PRIMARY KEY,
-  username varchar(100),
+  username varchar(100) UNIQUE KEY,
   password varchar(150)
 );
 
