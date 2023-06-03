@@ -1,22 +1,28 @@
 #[macro_use]
 extern crate rocket;
 
-use rocket::fairing::AdHoc;
-use rocket_db_pools::Database;
-
 pub mod schema;
 pub mod user;
+
+use rocket::{fairing::AdHoc, http::Status, serde::json::Json};
+use rocket::{Build, Rocket};
+use rocket_db_pools::{Connection, Database};
+use user::UserDTO;
 
 #[derive(Database)]
 #[database("recipe_db")]
 pub struct DB(sqlx::MySqlPool);
 
 #[launch]
-pub fn rocket() -> _ {
+fn launch() -> _ {
+    rocket()
+}
+
+pub fn rocket() -> Rocket<Build> {
     dotenvy::dotenv().expect("cannot find dotenv file");
 
     rocket::build()
-        .mount("/api", routes![user::login, user::register])
+        .mount("/api", routes![login, register])
         .attach(DB::init())
         .attach(AdHoc::try_on_ignite("Run migrations", |rocket| async {
             if let Some(db) = DB::fetch(&rocket) {
@@ -32,17 +38,12 @@ pub fn rocket() -> _ {
         }))
 }
 
-#[cfg(test)]
-mod tests {
-    // use super::rocket;
-    // use rocket::{http::Status, local::blocking::Client};
-    //
-    // #[test]
-    // fn index() {
-    //     let client = Client::tracked(super::rocket()).expect("valid rocket instance");
-    //     let response = client.get(format!("/api{}", uri!(super::index))).dispatch();
-    //
-    //     assert_eq!(response.status(), Status::Ok);
-    //     assert_eq!(response.into_string(), Some(String::from("Hello, world!")));
-    // }
+#[post("/login", data = "<user>")]
+pub async fn login(user: Json<UserDTO>, mut db: Connection<DB>) -> Result<String, Status> {
+    user::login(&user.into_inner(), &mut *db).await
+}
+
+#[post("/register", data = "<user>")]
+pub async fn register(user: Json<UserDTO>, mut db: Connection<DB>) -> Result<String, Status> {
+    user::register(&user.into_inner(), &mut db).await
 }
