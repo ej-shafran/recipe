@@ -1,6 +1,9 @@
 <script lang="ts">
-  import type { UserValues, UserFormErrors } from "../schemas/user.schema";
-  import { userSchema } from "../schemas/user.schema";
+  import type {
+    UserValues,
+    UserFormErrors,
+  } from "../common/schemas/user.schema";
+  import { userSchema } from "../common/schemas/user.schema";
 
   export let submit: (values: UserValues) => void;
   export let buttonText: string;

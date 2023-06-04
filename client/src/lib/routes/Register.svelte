@@ -8,4 +8,5 @@
   }
 </script>
 
+<h1>Register Page</h1>
 <UserForm submit={handleSubmit} buttonText="Register" />

@@ -8,4 +8,5 @@
   }
 </script>
 
+<h1>Login Page</h1>
 <UserForm submit={handleSubmit} buttonText="Log In" />

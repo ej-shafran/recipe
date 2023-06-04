@@ -8,6 +8,7 @@
   import Profile from "./lib/routes/Profile.svelte";
   import Home from "./lib/routes/Home.svelte";
   import Browse from "./lib/routes/Browse.svelte";
+  import AuthGuard from "./lib/components/AuthGuard.svelte";
 
   const routes = [
     "/browse",
@@ -17,9 +18,18 @@
     "/user/:id/profile",
     "/user/:id",
   ];
+
+  const privateRoutes = [
+    "/browse",
+    "/recipe/:id",
+    "/user/:id/profile",
+    "/user/:id",
+  ];
 </script>
 
 <Router>
+  <AuthGuard {privateRoutes} />
+
   <nav>
     {#each routes as to}
       <Link {to}>{to}</Link>
@@ -34,14 +44,15 @@
   <Route path="/register">
     <Register />
   </Route>
+
   <Route path="/recipe/:id" let:params>
-    <Recipe id={params.id}/>
+    <Recipe id={params.id} />
   </Route>
   <Route path="/user/:id/profile" let:params>
-    <Profile id={params.id}/>
+    <Profile id={params.id} />
   </Route>
   <Route path="/user/:id" let:params>
-    <Home id={params.id}/>
+    <Home id={params.id} />
   </Route>
   <Route path="/browse">
     <Browse />
