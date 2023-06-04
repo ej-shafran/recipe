@@ -13,3 +13,6 @@ dotenvy = "0.15"
 bcrypt = "0.14"
 anyhow = "1.0"
 uuid = { version = "1.3.3", features = ["v4", "fast-rng"] }
+jwt = "0.16.0"
+hmac = "0.12.1"
+sha2 = "0.10.6"
