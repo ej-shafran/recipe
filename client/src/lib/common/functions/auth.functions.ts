@@ -7,12 +7,12 @@ if (!AUTH_COOKIE) {
   throw new Error("No `AUTH_COOKIE` set in `import.meta.env`!");
 }
 
-export function getUserId() {
+export function getUserId(): string | null {
   const cookie = cookieJar.get(AUTH_COOKIE);
 
   if (cookie) console.log(decode(cookie));
 
-  return cookie ? decode<string>(cookie) : null;
+  return cookie ? decode<{ id: string }>(cookie).id : null;
 }
 
 export function isAuthenticated() {

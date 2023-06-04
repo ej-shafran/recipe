@@ -1,12 +1,12 @@
 #[macro_use]
 extern crate rocket;
 
-pub mod id_guard;
+pub mod auth;
 pub mod schema;
 pub mod user;
 
-use crate::id_guard::UserID;
-use rocket::http::{Cookie, CookieJar};
+use auth::UserID;
+use rocket::http::CookieJar;
 use rocket::{fairing::AdHoc, http::Status, serde::json::Json};
 use rocket::{Build, Rocket};
 use rocket_db_pools::{Connection, Database};
@@ -47,11 +47,9 @@ pub async fn login(
     mut db: Connection<DB>,
     cookies: &CookieJar<'_>,
 ) -> Result<(), Status> {
-    let id = user::login(&user.into_inner(), &mut *db).await?;
+    let id = user::login(&user.into_inner(), &mut db).await?;
 
-    let auth_cookie_name = std::env::var("AUTH_COOKIE").expect("No AUTH_COOKIE env variable set");
-    let signed_id = UserID::sign(id);
-    cookies.add(Cookie::new(auth_cookie_name, signed_id));
+    UserID::add_to_cookie(&id, cookies);
 
     Ok(())
 }
@@ -64,15 +62,13 @@ pub async fn register(
 ) -> Result<(), Status> {
     let id = user::register(&user.into_inner(), &mut db).await?;
 
-    let auth_cookie_name = std::env::var("AUTH_COOKIE").expect("No AUTH_COOKIE env variable set");
-    let signed_id = UserID::sign(id);
-    cookies.add(Cookie::new(auth_cookie_name, signed_id));
+    UserID::add_to_cookie(&id, cookies);
 
     Ok(())
 }
 
 #[get("/testing")]
-pub async fn testing(user_id: id_guard::UserID) -> Result<String, Status> {
+pub async fn testing(user_id: UserID) -> &'static str {
     dbg!(user_id);
-    todo!();
+    "Hello, user"
 }

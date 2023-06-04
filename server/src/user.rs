@@ -1,5 +1,6 @@
 use rocket::http::Status;
 use rocket::serde::Deserialize;
+use sqlx::mysql::MySqlDatabaseError;
 use sqlx::pool::PoolConnection;
 use sqlx::MySql;
 use uuid::Uuid;
@@ -23,7 +24,9 @@ pub async fn register(user: &UserDTO, db: &mut PoolConnection<MySql>) -> Result<
     );
 
     query.execute(&mut *db).await.map_err(|err| match err {
-        sqlx::Error::Database(err) if is_duplicate_key_err(&err) => Status::Unauthorized,
+        sqlx::Error::Database(err) if is_duplicate_key_err(err.downcast_ref()) => {
+            Status::Unauthorized
+        }
         _ => Status::InternalServerError,
     })?;
 
@@ -50,10 +53,9 @@ pub async fn login(user: &UserDTO, db: &mut PoolConnection<MySql>) -> Result<Str
 
 const DUPLICATE_KEY_CODE: &str = "23000";
 
-fn is_duplicate_key_err(err: &Box<dyn sqlx::error::DatabaseError>) -> bool {
-    use sqlx::mysql::MySqlDatabaseError;
-
-    err.downcast_ref::<MySqlDatabaseError>().code() == Some(DUPLICATE_KEY_CODE)
+#[inline]
+fn is_duplicate_key_err(err: &MySqlDatabaseError) -> bool {
+    err.code() == Some(DUPLICATE_KEY_CODE)
 }
 
 #[cfg(test)]

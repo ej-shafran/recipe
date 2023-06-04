@@ -1,10 +1,17 @@
 <script lang="ts">
   import axios from "axios";
   import UserForm from "../components/UserForm.svelte";
-  import type { UserValues } from "../schemas/user.schema";
+  import type { UserValues } from "../common/schemas/user.schema";
+  import { navigate } from "svelte-navigator";
+  import { getUserId } from "../common/functions/auth.functions";
 
   async function handleSubmit(values: UserValues) {
-    await axios.post("/api/login", values);
+    try {
+      await axios.post("/api/login", values);
+      navigate(`/user/${getUserId()}`);
+    } catch (error) {
+      //TODO: handle errors with a pop-up?
+    }
   }
 </script>
 
