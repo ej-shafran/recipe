@@ -4,7 +4,7 @@
 
 - [x] Set up project structure with Svelte (SvelteKit?).
 - [ ] Design and create the user interface for the recipe browsing page.
-- [ ] Implement user registration and login forms.
+- [x] Implement user registration and login forms.
 - [ ] Create the recipe details page with all the necessary information.
 - [ ] Implement the functionality to save recipes as favorites.
 - [ ] Design and implement the user profile page.
@@ -19,7 +19,7 @@
     - [ ] Style
 - [ ] Register & Login page
     - [ ] Markup
-    - [ ] Logic
+    - [x] Logic
     - [ ] Style
 - [ ] Recipe Details page
     - [ ] Markup
@@ -40,7 +40,7 @@
 - [x] Choose a suitable database system (e.g., MongoDB, PostgreSQL, MySQL).
 - [x] Set up the database connection and ensure it works with the backend.
 - [x] Design the database schema for recipes, users, and comments.
-- [ ] Implement user authentication and authorization.
+- [x] Implement user authentication and authorization.
 - [ ] Create RESTful API endpoints for recipe CRUD operations.
 - [ ] Write unit tests for the backend functionality.
 - [ ] Implement API endpoints for user actions like saving favorites and leaving comments.
