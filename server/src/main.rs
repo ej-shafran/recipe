@@ -4,6 +4,7 @@ extern crate rocket;
 pub mod auth;
 pub mod schema;
 pub mod user;
+pub mod recipe;
 
 use auth::UserID;
 use rocket::http::CookieJar;
