@@ -30,32 +30,26 @@ impl EnvVariables {
     }
 }
 
-fn from_request_impl(req: &Request<'_>) -> Result<UserID, ()> {
+fn from_request_impl(req: &Request<'_>) -> Option<UserID> {
     let env_variables = EnvVariables::parse();
 
-    let auth_cookie = req
-        .cookies()
-        .get(&env_variables.auth_cookie_name)
-        .ok_or(())?
-        .value();
+    let auth_cookie = req.cookies().get(&env_variables.auth_cookie_name)?.value();
 
-    let token: Claims = auth_cookie
-        .verify_with_key(&env_variables.key)
-        .or(Err(()))?;
+    let token: Claims = auth_cookie.verify_with_key(&env_variables.key).ok()?;
 
-    let expiration = token.registered.expiration.ok_or(())?;
+    let expiration = token.registered.expiration?;
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .expect("now should be after 1970")
         .as_secs();
 
     if now >= expiration {
-        return Err(());
+        return None;
     }
 
     match token.private.get("id") {
-        Some(json::Value::String(id)) => Ok(UserID(id.to_string())),
-        _ => Err(()),
+        Some(json::Value::String(id)) => Some(UserID(id.to_string())),
+        _ => None,
     }
 }
 
@@ -65,8 +59,8 @@ impl<'r> FromRequest<'r> for UserID {
 
     async fn from_request(req: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
         match from_request_impl(req) {
-            Err(()) => request::Outcome::Failure((Status::Unauthorized, ())),
-            Ok(user_id) => request::Outcome::Success(user_id),
+            None => request::Outcome::Failure((Status::Unauthorized, ())),
+            Some(user_id) => request::Outcome::Success(user_id),
         }
     }
 }
