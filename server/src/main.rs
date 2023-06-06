@@ -26,7 +26,7 @@ pub fn rocket() -> Rocket<Build> {
     dotenvy::dotenv().expect("cannot find dotenv file");
 
     rocket::build()
-        .mount("/api", routes![login, register, testing])
+        .mount("/api", routes![login, register])
         .attach(DB::init())
         .attach(AdHoc::try_on_ignite("Run migrations", |rocket| async {
             if let Some(db) = DB::fetch(&rocket) {
@@ -68,8 +68,3 @@ pub async fn register(
     Ok(())
 }
 
-#[get("/testing")]
-pub async fn testing(user_id: UserID) -> &'static str {
-    dbg!(user_id);
-    "Hello, user"
-}
