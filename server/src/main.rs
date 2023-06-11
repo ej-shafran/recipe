@@ -7,12 +7,10 @@ pub mod schema;
 pub mod user;
 
 use auth::UserID;
-use recipe::RecipeDTO;
 use rocket::http::CookieJar;
 use rocket::{fairing::AdHoc, http::Status, serde::json::Json};
 use rocket::{Build, Rocket};
 use rocket_db_pools::{Connection, Database};
-use schema::{RecipeDetails, RecipePreview};
 use user::UserDTO;
 
 #[derive(Database)]
@@ -28,17 +26,8 @@ pub fn rocket() -> Rocket<Build> {
     dotenvy::dotenv().expect("cannot find dotenv file");
 
     rocket::build()
-        .mount(
-            "/api",
-            routes![
-                login,
-                register,
-                create_recipe,
-                recipe_details,
-                recipe_previews,
-                delete_recipe,
-            ],
-        )
+        .mount("/api", routes![login, register])
+        .mount("/api/recipes", recipe::routes::index())
         .attach(DB::init())
         .attach(AdHoc::try_on_ignite("Run migrations", |rocket| async {
             if let Some(db) = DB::fetch(&rocket) {
@@ -78,43 +67,4 @@ pub async fn register(
     UserID::add_to_cookie(&id, cookies);
 
     Ok(())
-}
-
-#[post("/recipes/create", data = "<recipe>")]
-pub async fn create_recipe(
-    recipe: Json<RecipeDTO>,
-    user_id: UserID,
-    mut db: Connection<DB>,
-) -> Result<Json<u64>, Status> {
-    let user_id: String = user_id.into();
-
-    let id = recipe::create_one(&recipe, &user_id, &mut db).await?;
-
-    Ok(id.into())
-}
-
-#[get("/recipes/previews?<page>&<limit>")]
-pub async fn recipe_previews(
-    page: u32,
-    limit: u32,
-    mut db: Connection<DB>,
-) -> Result<Json<Vec<RecipePreview>>, Status> {
-    recipe::read_previews(page, limit, &mut db)
-        .await
-        .map(|value| value.into())
-}
-
-#[get("/recipes/<id>")]
-pub async fn recipe_details(
-    id: u64,
-    mut db: Connection<DB>,
-) -> Result<Json<RecipeDetails>, Status> {
-    recipe::read_details(id, &mut db)
-        .await
-        .map(|value| value.into())
-}
-
-#[delete("/recipes/<id>")]
-pub async fn delete_recipe(id: u64, _user: UserID, mut db: Connection<DB>) -> Result<(), Status> {
-    recipe::delete_one(id, &mut db).await
 }
