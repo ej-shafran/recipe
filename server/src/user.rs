@@ -83,7 +83,7 @@ mod tests {
             username: correct_user.username.clone(),
         };
 
-        let id = register(&correct_user, &mut db)
+        register(&correct_user, &mut db)
             .await
             .expect("valid addition to db");
 

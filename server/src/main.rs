@@ -35,7 +35,8 @@ pub fn rocket() -> Rocket<Build> {
                 register,
                 create_recipe,
                 recipe_details,
-                recipe_previews
+                recipe_previews,
+                delete_recipe,
             ],
         )
         .attach(DB::init())
@@ -87,7 +88,7 @@ pub async fn create_recipe(
 ) -> Result<Json<u64>, Status> {
     let user_id: String = user_id.into();
 
-    let id = recipe::create(&recipe, &user_id, &mut db).await?;
+    let id = recipe::create_one(&recipe, &user_id, &mut db).await?;
 
     Ok(id.into())
 }
@@ -111,4 +112,9 @@ pub async fn recipe_details(
     recipe::read_details(id, &mut db)
         .await
         .map(|value| value.into())
+}
+
+#[delete("/recipes/<id>")]
+pub async fn delete_recipe(id: u64, _user: UserID, mut db: Connection<DB>) -> Result<(), Status> {
+    recipe::delete_one(id, &mut db).await
 }

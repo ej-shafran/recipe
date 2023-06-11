@@ -10,7 +10,7 @@ pub struct RecipeDTO {
     pub content: String,
 }
 
-pub async fn create(
+pub async fn create_one(
     recipe: &RecipeDTO,
     poster_id: &str,
     db: &mut PoolConnection<MySql>,
@@ -103,29 +103,47 @@ pub async fn read_previews(
         .collect())
 }
 
+pub async fn delete_one(id: u64, db: &mut PoolConnection<MySql>) -> Result<(), Status> {
+    let query = sqlx::query!("DELETE FROM recipe WHERE id = ?", id);
+
+    match query.execute(&mut *db).await {
+        Ok(_) => Ok(()),
+        Err(sqlx::Error::RowNotFound) => Err(Status::NotFound),
+        Err(_) => Err(Status::InternalServerError),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::user::{self, UserDTO};
     use sqlx::MySqlPool;
 
-    #[sqlx::test]
-    #[ignore]
-    async fn creates_and_reads_details(pool: MySqlPool) {
-        let mut db = pool.acquire().await.expect("invalid connection");
+    fn get_dto(index: u32) -> RecipeDTO {
+        RecipeDTO {
+            title: format!("Title for {index}"),
+            content: format!("Content for {index}"),
+        }
+    }
 
+    async fn get_user_id(db: &mut PoolConnection<MySql>) -> String {
         let test_user = UserDTO {
             username: String::from("testing"),
             password: String::from("abcd"),
         };
-        let user_id = user::register(&test_user, &mut db).await.unwrap();
 
-        let first_recipe = RecipeDTO {
-            title: String::from("Gramama's Golden Cookies"),
-            content: String::from("My grandma used to love baking us cookies..."),
-        };
+        user::register(&test_user, db).await.unwrap()
+    }
 
-        let recipe_id = create(&first_recipe, &user_id, &mut db)
+    #[sqlx::test]
+    #[ignore]
+    async fn creates_and_reads_details(pool: MySqlPool) {
+        let mut db = pool.acquire().await.unwrap();
+
+        let user_id = get_user_id(&mut db).await;
+        let first_recipe = get_dto(0);
+
+        let recipe_id = create_one(&first_recipe, &user_id, &mut db)
             .await
             .expect("failed to create recipe");
 
@@ -139,30 +157,21 @@ mod tests {
 
     #[sqlx::test]
     #[ignore]
-    async fn creates_and_reads_previews(pool: MySqlPool) {
-        let mut db = pool.acquire().await.expect("invalid connection");
+    async fn reads_previews(pool: MySqlPool) {
+        let mut db = pool.acquire().await.unwrap();
 
-        let test_user = UserDTO {
-            username: String::from("testing"),
-            password: String::from("abcd"),
-        };
-        let user_id = user::register(&test_user, &mut db).await.unwrap();
+        let user_id = get_user_id(&mut db).await;
 
         let mut handles = Vec::new();
 
         for i in 1..=15 {
             let user_id = user_id.clone();
-            let mut db = pool.acquire().await.expect("invalid connection");
+            let mut db = pool.acquire().await.unwrap();
 
-            let recipe = RecipeDTO {
-                title: format!("Recipe {}", i),
-                content: format!("Content for Recipe {}", i),
-            };
+            let recipe = get_dto(i);
 
             let handle = rocket::tokio::task::spawn(async move {
-                create(&recipe, &user_id, &mut db)
-                    .await
-                    .expect("failed to create recipe");
+                create_one(&recipe, &user_id, &mut db).await.unwrap()
             });
 
             handles.push(handle);
@@ -172,16 +181,30 @@ mod tests {
             handle.await.unwrap();
         }
 
-        let preview_first_page = read_previews(1, 10, &mut db)
+        for i in 1..=3 {
+            let previews = read_previews(i, 5, &mut db)
+                .await
+                .expect("could not read previews");
+
+            assert_eq!(previews.len(), 5);
+        }
+    }
+
+    #[sqlx::test]
+    #[ignore]
+    async fn deletes(pool: MySqlPool) {
+        let mut db = pool.acquire().await.unwrap();
+
+        let user_id = get_user_id(&mut db).await;
+        let recipe = get_dto(0);
+
+        let recipe_id = create_one(&recipe, &user_id, &mut db).await.unwrap();
+
+        delete_one(recipe_id, &mut db)
             .await
-            .expect("could not read previews");
+            .expect("failed to delete recipe");
 
-        assert_eq!(preview_first_page.len(), 10);
-
-        let preview_second_page = read_previews(2, 10, &mut db)
-            .await
-            .expect("could not read previews");
-
-        assert_eq!(preview_second_page.len(), 5);
+        let from_db = read_details(recipe_id, &mut db).await.unwrap_err();
+        assert_eq!(from_db, Status::NotFound);
     }
 }
