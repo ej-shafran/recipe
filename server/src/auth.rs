@@ -65,6 +65,12 @@ impl<'r> FromRequest<'r> for UserID {
     }
 }
 
+impl Into<String> for UserID {
+    fn into(self) -> String {
+        self.0
+    }
+}
+
 const WEEK_IN_SECONDS: u64 = 604800;
 
 impl UserID {

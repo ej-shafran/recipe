@@ -87,8 +87,6 @@ mod tests {
             .await
             .expect("valid addition to db");
 
-        dbg!(id);
-
         assert!(
             login(&correct_user, &mut db).await.is_ok(),
             "login with correct credentials should work"
