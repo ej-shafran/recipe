@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Link, Route, Router } from "svelte-navigator";
+  import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
 
   import Index from "./lib/routes/Index.svelte";
   import Login from "./lib/routes/Login.svelte";
@@ -25,43 +26,47 @@
     "/user/:id/profile",
     "/user/:id",
   ];
+
+  const client = new QueryClient();
 </script>
 
-<Router>
-  <AuthGuard {privateRoutes} />
+<QueryClientProvider {client}>
+  <Router>
+    <AuthGuard {privateRoutes} />
 
-  <nav>
-    {#each routes as to}
-      <Link {to}>{to}</Link>
-    {/each}
-  </nav>
+    <nav>
+      {#each routes as to}
+        <Link {to}>{to}</Link>
+      {/each}
+    </nav>
 
-  <Route path="/" component={Index} />
+    <Route path="/" component={Index} />
 
-  <Route path="/login">
-    <Login />
-  </Route>
-  <Route path="/register">
-    <Register />
-  </Route>
+    <Route path="/login">
+      <Login />
+    </Route>
+    <Route path="/register">
+      <Register />
+    </Route>
 
-  <Route path="/recipe/:id" let:params>
-    <Recipe id={params.id} />
-  </Route>
-  <Route path="/user/:id/profile" let:params>
-    <Profile id={params.id} />
-  </Route>
-  <Route path="/user/:id" let:params>
-    <Home id={params.id} />
-  </Route>
-  <Route path="/browse">
-    <Browse />
-  </Route>
+    <Route path="/recipe/:id" let:params>
+      <Recipe id={params.id} />
+    </Route>
+    <Route path="/user/:id/profile" let:params>
+      <Profile id={params.id} />
+    </Route>
+    <Route path="/user/:id" let:params>
+      <Home id={params.id} />
+    </Route>
+    <Route path="/browse">
+      <Browse />
+    </Route>
 
-  <Route>
-    <h1>Error 404: Page Not Found</h1>
-  </Route>
-</Router>
+    <Route>
+      <h1>Error 404: Page Not Found</h1>
+    </Route>
+  </Router>
+</QueryClientProvider>
 
 <style>
   nav {
