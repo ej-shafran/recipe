@@ -79,7 +79,7 @@ pub async fn read_details(
 
 pub async fn read_previews(
     page: u32,
-    limit: u32,
+    limit: u8,
     db: &mut PoolConnection<MySql>,
 ) -> Result<PreviewResponse, Status> {
     let mut transaction = db.begin().await.or(Err(Status::InternalServerError))?;
@@ -98,7 +98,7 @@ pub async fn read_previews(
          ON r.id = c.recipe_id
          GROUP BY r.id;",
         limit,
-        (page - 1) * limit,
+        (page - 1) * (limit as u32),
     );
 
     let rows = query
@@ -129,7 +129,7 @@ pub async fn read_previews(
 
     Ok(PreviewResponse {
         results,
-        next_page: if count <= page * limit {
+        next_page: if count <= page * (limit as u32) {
             None
         } else {
             Some(page + 1)

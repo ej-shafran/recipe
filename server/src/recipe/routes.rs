@@ -22,7 +22,7 @@ pub async fn post(
 #[get("/previews?<page>&<limit>")]
 pub async fn get_previews(
     page: u32,
-    limit: u32,
+    limit: u8,
     mut db: Connection<DB>,
 ) -> Result<Json<super::PreviewResponse>, Status> {
     super::read_previews(page, limit, &mut db)
