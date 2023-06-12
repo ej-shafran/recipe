@@ -31,7 +31,7 @@ pub async fn create_one(
     db: &mut PoolConnection<MySql>,
 ) -> Result<u64, Status> {
     let query = sqlx::query!(
-        "INSERT INTO recipe (title, content, poster_id) VALUES (?, ?, ?);",
+        "INSERT INTO recipe (title, content, user_id) VALUES (?, ?, ?);",
         recipe.title,
         recipe.content,
         poster_id
@@ -56,7 +56,7 @@ pub async fn read_details(
             u.username AS `poster_name!` 
         FROM recipe AS r 
         JOIN user AS u 
-        ON r.poster_id = u.id 
+        ON r.user_id = u.id 
         WHERE r.id = ?;",
         id
     );
@@ -91,9 +91,9 @@ pub async fn read_previews(
             u.id AS poster_id,
             u.username AS `poster_name!`,
             COUNT(c.id) AS `comment_count: u64`
-         FROM (SELECT id, title, poster_id FROM recipe LIMIT ? OFFSET ?) AS r
+         FROM (SELECT id, title, user_id FROM recipe LIMIT ? OFFSET ?) AS r
          JOIN user AS u
-         ON r.poster_id = u.id
+         ON r.user_id = u.id
          LEFT JOIN comment AS c
          ON r.id = c.recipe_id
          GROUP BY r.id;",

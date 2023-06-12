@@ -29,7 +29,7 @@ pub struct RecipeDetails {
 #[derive(Debug, Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct Comment {
-    pub id: u32,
+    pub id: u64,
     pub content: String,
     pub poster: User,
 }

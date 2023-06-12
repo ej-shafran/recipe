@@ -2,6 +2,7 @@
 extern crate rocket;
 
 pub mod auth;
+pub mod comment;
 pub mod recipe;
 pub mod schema;
 pub mod user;

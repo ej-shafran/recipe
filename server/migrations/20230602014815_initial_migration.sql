@@ -10,10 +10,10 @@ CREATE TABLE `recipe` (
   id int PRIMARY KEY AUTO_INCREMENT,
   title varchar(240) NOT NULL,
   content text NOT NULL,
-  poster_id varchar(36) NOT NULL,
+  user_id varchar(36) NOT NULL,
   created_at timestamp DEFAULT CURRENT_TIMESTAMP,
   -- Recipe >- Many:One -> User (Poster)
-  FOREIGN KEY(poster_id) REFERENCES `user`(id)
+  FOREIGN KEY(user_id) REFERENCES `user`(id)
 );
 
 -- Recipe >- Many:Many -< User (Saved)
