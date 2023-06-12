@@ -8,7 +8,7 @@ export type RecipePreviewDTO = {
   };
 };
 
-export type RecipePreviews = {
+export type PreviewData = {
   nextPage: number | null;
   results: RecipePreviewDTO[];
 };

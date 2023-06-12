@@ -2,22 +2,20 @@
   import { createInfiniteQuery } from "@tanstack/svelte-query";
   import axios from "axios";
 
-  import type { RecipePreviews } from "../common/dto/RecipePreview.dto";
+  import type { PreviewData } from "../common/dto/RecipePreview.dto";
+  import RecipePreview from "../components/RecipePreview.svelte";
 
   const LIMIT = 2;
 
   const query = createInfiniteQuery({
     queryKey: ["browse-recipe-previews"],
     queryFn: async ({ pageParam = 1 }) => {
-      const { data } = await axios.get<RecipePreviews>(
-        "/api/recipes/previews",
-        {
-          params: {
-            page: pageParam,
-            limit: LIMIT,
-          },
-        }
-      );
+      const { data } = await axios.get<PreviewData>("/api/recipes/previews", {
+        params: {
+          page: pageParam,
+          limit: LIMIT,
+        },
+      });
 
       return data;
     },
@@ -35,8 +33,12 @@
   </div>
 {:else}
   <div>
-    DATA! <pre>{JSON.stringify($query.data, null, 2)}</pre>
+    {#each $query.data.pages.flatMap((page) => page.results) as recipePreview}
+      <RecipePreview {recipePreview} />
+    {/each}
   </div>
 {/if}
 
-<button on:click={() => $query.fetchNextPage()}>Next Page</button>
+{#if $query.hasNextPage}
+  <button on:click={() => $query.fetchNextPage()}>Next Page</button>
+{/if}
