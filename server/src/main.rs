@@ -6,12 +6,9 @@ pub mod recipe;
 pub mod schema;
 pub mod user;
 
-use auth::UserID;
-use rocket::http::CookieJar;
-use rocket::{fairing::AdHoc, http::Status, serde::json::Json};
+use rocket::fairing::AdHoc;
 use rocket::{Build, Rocket};
-use rocket_db_pools::{Connection, Database};
-use user::UserDTO;
+use rocket_db_pools::Database;
 
 #[derive(Database)]
 #[database("recipe_db")]
@@ -26,7 +23,7 @@ pub fn rocket() -> Rocket<Build> {
     dotenvy::dotenv().expect("cannot find dotenv file");
 
     rocket::build()
-        .mount("/api", routes![login, register])
+        .mount("/api", user::routes::index())
         .mount("/api/recipes", recipe::routes::index())
         .attach(DB::init())
         .attach(AdHoc::try_on_ignite("Run migrations", |rocket| async {
@@ -41,30 +38,4 @@ pub fn rocket() -> Rocket<Build> {
                 Err(rocket)
             }
         }))
-}
-
-#[post("/login", data = "<user>")]
-pub async fn login(
-    user: Json<UserDTO>,
-    mut db: Connection<DB>,
-    cookies: &CookieJar<'_>,
-) -> Result<(), Status> {
-    let id = user::login(&user.into_inner(), &mut db).await?;
-
-    UserID::add_to_cookie(&id, cookies);
-
-    Ok(())
-}
-
-#[post("/register", data = "<user>")]
-pub async fn register(
-    user: Json<UserDTO>,
-    mut db: Connection<DB>,
-    cookies: &CookieJar<'_>,
-) -> Result<(), Status> {
-    let id = user::register(&user.into_inner(), &mut db).await?;
-
-    UserID::add_to_cookie(&id, cookies);
-
-    Ok(())
 }
