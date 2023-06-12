@@ -4,16 +4,19 @@
 
   import type { PreviewData } from "../common/dto/RecipePreview.dto";
   import RecipePreview from "../components/RecipePreview.svelte";
+  import Loading from "../components/Loading.svelte";
 
-  const LIMIT = 2;
+  const limit = 2;
 
   const query = createInfiniteQuery({
     queryKey: ["browse-recipe-previews"],
-    queryFn: async ({ pageParam = 1 }) => {
-      const { data } = await axios.get<PreviewData>("/api/recipes/previews", {
+    queryFn: async ({ pageParam: page = 1 }) => {
+      const { data } = await axios<PreviewData>({
+        method: "GET",
+        url: "/api/recipes/previews",
         params: {
-          page: pageParam,
-          limit: LIMIT,
+          page,
+          limit,
         },
       });
 
@@ -26,17 +29,19 @@
 <h1>Browse Page</h1>
 
 {#if $query.isLoading}
-  <div>Loading...</div>
+  <Loading />
 {:else if $query.isError}
   <div>
     ERROR! <pre>{JSON.stringify($query.error)}</pre>
   </div>
 {:else}
-  <div>
+  <ul>
     {#each $query.data.pages.flatMap((page) => page.results) as recipePreview}
-      <RecipePreview {recipePreview} />
+      <li>
+        <RecipePreview {recipePreview} />
+      </li>
     {/each}
-  </div>
+  </ul>
 {/if}
 
 {#if $query.hasNextPage}
