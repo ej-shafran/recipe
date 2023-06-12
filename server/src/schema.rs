@@ -13,6 +13,7 @@ pub struct RecipePreview {
     pub id: u64,
     pub title: String,
     pub poster: User,
+    #[serde(rename = "commentCount")]
     pub comment_count: u64,
 }
 

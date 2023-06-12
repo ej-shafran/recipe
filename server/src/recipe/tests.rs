@@ -69,7 +69,7 @@ async fn reads_previews(pool: MySqlPool) {
             .await
             .expect("could not read previews");
 
-        assert_eq!(previews.len(), 5);
+        assert_eq!(previews.results.len(), 5);
     }
 }
 

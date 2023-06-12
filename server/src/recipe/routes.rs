@@ -24,7 +24,7 @@ pub async fn get_previews(
     page: u32,
     limit: u32,
     mut db: Connection<DB>,
-) -> Result<Json<Vec<schema::RecipePreview>>, Status> {
+) -> Result<Json<super::PreviewResponse>, Status> {
     super::read_previews(page, limit, &mut db)
         .await
         .map(|value| value.into())

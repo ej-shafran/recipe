@@ -1,6 +1,9 @@
 use crate::schema::{RecipeDetails, RecipePreview, User};
-use rocket::{http::Status, serde::Deserialize};
-use sqlx::{pool::PoolConnection, MySql};
+use rocket::{
+    http::Status,
+    serde::{Deserialize, Serialize},
+};
+use sqlx::{pool::PoolConnection, Connection, MySql};
 
 pub mod routes;
 
@@ -12,6 +15,14 @@ mod tests;
 pub struct RecipeDTO {
     pub title: String,
     pub content: String,
+}
+
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
+pub struct PreviewResponse {
+    pub results: Vec<RecipePreview>,
+    #[serde(rename = "nextPage")]
+    pub next_page: Option<u32>,
 }
 
 pub async fn create_one(
@@ -70,7 +81,9 @@ pub async fn read_previews(
     page: u32,
     limit: u32,
     db: &mut PoolConnection<MySql>,
-) -> Result<Vec<RecipePreview>, Status> {
+) -> Result<PreviewResponse, Status> {
+    let mut transaction = db.begin().await.or(Err(Status::InternalServerError))?;
+
     let query = sqlx::query!(
         "SELECT 
             r.id AS `id: u64`,
@@ -89,11 +102,19 @@ pub async fn read_previews(
     );
 
     let rows = query
-        .fetch_all(&mut *db)
+        .fetch_all(&mut transaction)
         .await
         .or(Err(Status::InternalServerError))?;
 
-    Ok(rows
+    let query = sqlx::query!("SELECT COUNT(id) AS `count: u32` FROM recipe;");
+
+    let count = query
+        .fetch_one(&mut transaction)
+        .await
+        .or(Err(Status::InternalServerError))?
+        .count;
+
+    let results: Vec<RecipePreview> = rows
         .into_iter()
         .map(|row| RecipePreview {
             id: row.id,
@@ -104,7 +125,16 @@ pub async fn read_previews(
             },
             comment_count: row.comment_count,
         })
-        .collect())
+        .collect();
+
+    Ok(PreviewResponse {
+        results,
+        next_page: if count <= page * limit {
+            None
+        } else {
+            Some(page + 1)
+        },
+    })
 }
 
 pub async fn delete_one(id: u64, db: &mut PoolConnection<MySql>) -> Result<(), Status> {
