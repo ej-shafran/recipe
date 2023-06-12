@@ -23,8 +23,8 @@ pub fn rocket() -> Rocket<Build> {
     dotenvy::dotenv().expect("cannot find dotenv file");
 
     rocket::build()
-        .mount("/api", user::routes::index())
-        .mount("/api/recipes", recipe::routes::index())
+        .mount("/api/user", user::routes::index())
+        .mount("/api/recipe", recipe::routes::index())
         .attach(DB::init())
         .attach(AdHoc::try_on_ignite("Run migrations", |rocket| async {
             if let Some(db) = DB::fetch(&rocket) {

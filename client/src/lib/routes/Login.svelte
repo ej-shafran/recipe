@@ -9,7 +9,7 @@
   const mutation = createMutation({
     mutationKey: ["login"],
     mutationFn: async (values: UserValues) => {
-      await axios.post("/api/login", values);
+      await axios.post("/api/user/login", values);
     },
     onSuccess: () => {
       navigate(`/user/${getUserId()}`);

@@ -14,7 +14,7 @@
     queryFn: async () => {
       const { data } = await axios<RecipeDetailsDTO>({
         method: "GET",
-        url: `/api/recipes/${id}`,
+        url: `/api/recipe/${id}`,
       });
 
       return data;

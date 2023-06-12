@@ -13,7 +13,7 @@
     queryFn: async ({ pageParam: page = 1 }) => {
       const { data } = await axios<PreviewData>({
         method: "GET",
-        url: "/api/recipes/previews",
+        url: "/api/recipe/previews",
         params: {
           page,
           limit,
