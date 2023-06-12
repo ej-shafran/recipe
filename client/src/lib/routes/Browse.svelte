@@ -25,7 +25,7 @@
   });
 </script>
 
-<h1>Browse Pager</h1>
+<h1>Browse Page</h1>
 
 {#if $query.isLoading}
   <div>Loading...</div>
