@@ -1,19 +1,21 @@
 <script lang="ts">
   import axios from "axios";
-  import UserForm from "../components/UserForm.svelte";
-  import type { UserValues } from "../common/schemas/user.schema";
   import { navigate } from "svelte-navigator";
+  import { createMutation } from "@tanstack/svelte-query";
+  import UserForm from "../components/UserForm.svelte";
   import { getUserId } from "../common/functions/auth.functions";
+  import type { UserValues } from "../common/schemas/user.schema";
 
-  async function handleSubmit(values: UserValues) {
-    try {
+  const mutation = createMutation({
+    mutationKey: ["register"],
+    mutationFn: async (values: UserValues) => {
       await axios.post("/api/register", values);
+    },
+    onSuccess: () => {
       navigate(`/user/${getUserId()}`);
-    } catch (error) {
-      //TODO: handle errors with a pop-up?
-    }
-  }
+    },
+  });
 </script>
 
 <h1>Register Page</h1>
-<UserForm submit={handleSubmit} buttonText="Register" />
+<UserForm submit={$mutation.mutate} buttonText="Register" />
