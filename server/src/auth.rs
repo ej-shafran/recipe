@@ -65,9 +65,9 @@ impl<'r> FromRequest<'r> for UserID {
     }
 }
 
-impl Into<String> for UserID {
-    fn into(self) -> String {
-        self.0
+impl From<UserID> for String {
+    fn from(value: UserID) -> Self {
+        value.0
     }
 }
 
