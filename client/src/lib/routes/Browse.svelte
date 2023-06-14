@@ -2,16 +2,17 @@
   import { createInfiniteQuery } from "@tanstack/svelte-query";
   import axios from "axios";
 
-  import type { PreviewData } from "../common/dto/RecipePreview.dto";
   import RecipePreview from "../components/RecipePreview.svelte";
   import Loading from "../components/Loading.svelte";
+  import type { Paginated } from "../common/dto/Paginated.dto";
+  import type { RecipePreviewDTO } from "../common/dto/RecipePreview.dto";
 
   const limit = 2;
 
   const query = createInfiniteQuery({
     queryKey: ["browse-recipe-previews"],
     queryFn: async ({ pageParam: page = 1 }) => {
-      const { data } = await axios<PreviewData>({
+      const { data } = await axios<Paginated<RecipePreviewDTO>>({
         method: "GET",
         url: "/api/recipe/previews",
         params: {

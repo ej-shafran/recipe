@@ -24,7 +24,7 @@ pub async fn get_previews(
     page: u32,
     limit: u8,
     mut db: Connection<DB>,
-) -> Result<Json<super::PreviewResponse>, Status> {
+) -> Result<Json<schema::Paginated<schema::RecipePreview>>, Status> {
     super::read_previews(page, limit, &mut db)
         .await
         .map(|value| value.into())
