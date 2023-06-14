@@ -1,8 +1,5 @@
-use crate::schema::{RecipeDetails, RecipePreview, User};
-use rocket::{
-    http::Status,
-    serde::{Deserialize, Serialize},
-};
+use crate::schema::{Paginated, RecipeDetails, RecipePreview, User};
+use rocket::{http::Status, serde::Deserialize};
 use sqlx::{pool::PoolConnection, Connection, MySql};
 
 pub mod routes;
@@ -15,14 +12,6 @@ mod tests;
 pub struct RecipeDTO {
     pub title: String,
     pub content: String,
-}
-
-#[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
-pub struct PreviewResponse {
-    pub results: Vec<RecipePreview>,
-    #[serde(rename = "nextPage")]
-    pub next_page: Option<u32>,
 }
 
 pub async fn create_one(
@@ -81,7 +70,7 @@ pub async fn read_previews(
     page: u32,
     limit: u8,
     db: &mut PoolConnection<MySql>,
-) -> Result<PreviewResponse, Status> {
+) -> Result<Paginated<RecipePreview>, Status> {
     let mut transaction = db.begin().await.or(Err(Status::InternalServerError))?;
 
     let query = sqlx::query!(
@@ -127,7 +116,7 @@ pub async fn read_previews(
         })
         .collect();
 
-    Ok(PreviewResponse {
+    Ok(Paginated {
         results,
         next_page: if count <= page * (limit as u32) {
             None

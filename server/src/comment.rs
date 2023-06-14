@@ -1,24 +1,16 @@
-use crate::schema::{Comment, User};
-use rocket::{http::Status, serde::Serialize};
+use crate::schema::{Comment, Paginated, User};
+use rocket::http::Status;
 use sqlx::{pool::PoolConnection, Connection, MySql};
 
 #[cfg(test)]
 mod tests;
-
-#[derive(Serialize)]
-#[serde(crate = "rocket::serde")]
-pub struct CommentResponse {
-    pub results: Vec<Comment>,
-    #[serde(rename = "nextPage")]
-    pub next_page: Option<u32>,
-}
 
 pub async fn read_many(
     recipe_id: u64,
     page: u32,
     limit: u8,
     db: &mut PoolConnection<MySql>,
-) -> Result<CommentResponse, Status> {
+) -> Result<Paginated<Comment>, Status> {
     let mut transaction = db.begin().await.or(Err(Status::InternalServerError))?;
 
     let query = sqlx::query!(
@@ -64,7 +56,7 @@ pub async fn read_many(
         })
         .collect();
 
-    Ok(CommentResponse {
+    Ok(Paginated {
         results,
         next_page: if count <= page * (limit as u32) {
             None

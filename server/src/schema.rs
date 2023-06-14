@@ -33,3 +33,14 @@ pub struct Comment {
     pub content: String,
     pub poster: User,
 }
+
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
+pub struct Paginated<T>
+where
+    T: Serialize,
+{
+    pub results: Vec<T>,
+    #[serde(rename = "nextPage")]
+    pub next_page: Option<u32>,
+}
