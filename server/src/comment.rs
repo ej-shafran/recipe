@@ -1,9 +1,35 @@
 use crate::schema::{Comment, Paginated, User};
-use rocket::http::Status;
+use rocket::{http::Status, serde::Deserialize};
 use sqlx::{pool::PoolConnection, Connection, MySql};
 
 #[cfg(test)]
 mod tests;
+
+#[derive(Deserialize)]
+#[serde(crate = "rocket::serde")]
+pub struct CommentDTO {
+    pub content: String,
+}
+
+pub async fn create_one(
+    comment: &CommentDTO,
+    user_id: &str,
+    recipe_id: u64,
+    db: &mut PoolConnection<MySql>,
+) -> Result<u64, Status> {
+    let query = sqlx::query!(
+        "INSERT INTO comment (content, user_id, recipe_id) VALUES (?, ?, ?);",
+        comment.content,
+        user_id,
+        recipe_id
+    );
+
+    query
+        .execute(db)
+        .await
+        .or(Err(Status::InternalServerError))
+        .map(|response| response.last_insert_id())
+}
 
 pub async fn read_many(
     recipe_id: u64,
