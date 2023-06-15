@@ -7,6 +7,9 @@ pub mod recipe;
 pub mod schema;
 pub mod user;
 
+#[cfg(test)]
+mod tests;
+
 use rocket::fairing::AdHoc;
 use rocket::{Build, Rocket};
 use rocket_db_pools::Database;

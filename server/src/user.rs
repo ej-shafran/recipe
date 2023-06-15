@@ -1,16 +1,16 @@
 use rocket::http::Status;
-use rocket::serde::Deserialize;
+use rocket::serde::{Deserialize, Serialize};
 use sqlx::mysql::MySqlDatabaseError;
 use sqlx::pool::PoolConnection;
 use sqlx::MySql;
 use uuid::Uuid;
 
 #[cfg(test)]
-mod tests; 
+mod tests;
 
 pub mod routes;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct UserDTO {
     pub username: String,
@@ -62,4 +62,3 @@ const DUPLICATE_KEY_CODE: &str = "23000";
 fn is_duplicate_key_err(err: &MySqlDatabaseError) -> bool {
     err.code() == Some(DUPLICATE_KEY_CODE)
 }
-
