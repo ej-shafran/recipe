@@ -14,9 +14,9 @@ pub async fn post(
 ) -> Result<Json<u64>, Status> {
     let user_id: String = user_id.into();
 
-    let id = super::create_one(&recipe, &user_id, &mut db).await?;
-
-    Ok(id.into())
+    super::create_one(&recipe, &user_id, &mut db)
+        .await
+        .map(Json::from)
 }
 
 #[get("/previews?<page>&<limit>")]
@@ -27,7 +27,7 @@ pub async fn get_previews(
 ) -> Result<Json<schema::Paginated<schema::RecipePreview>>, Status> {
     super::read_previews(page, limit, &mut db)
         .await
-        .map(|value| value.into())
+        .map(Json::from)
 }
 
 #[get("/<id>")]
@@ -35,9 +35,7 @@ pub async fn get_details(
     id: u64,
     mut db: Connection<DB>,
 ) -> Result<Json<schema::RecipeDetails>, Status> {
-    super::read_details(id, &mut db)
-        .await
-        .map(|value| value.into())
+    super::read_details(id, &mut db).await.map(Json::from)
 }
 
 #[delete("/<id>")]

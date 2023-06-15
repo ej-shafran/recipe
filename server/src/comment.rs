@@ -2,6 +2,8 @@ use crate::schema::{Comment, Paginated, User};
 use rocket::{http::Status, serde::Deserialize};
 use sqlx::{pool::PoolConnection, Connection, MySql};
 
+pub mod routes;
+
 #[cfg(test)]
 mod tests;
 

@@ -26,6 +26,7 @@ pub fn rocket() -> Rocket<Build> {
     rocket::build()
         .mount("/api/user", user::routes::index())
         .mount("/api/recipe", recipe::routes::index())
+        .mount("/api/comment", comment::routes::index())
         .attach(DB::init())
         .attach(AdHoc::try_on_ignite("Run migrations", |rocket| async {
             if let Some(db) = DB::fetch(&rocket) {
