@@ -1,4 +1,4 @@
-use crate::user::UserDTO;
+use crate::{recipe::RecipeDTO, user::UserDTO};
 use rocket::{http::Status, local::asynchronous::Client, serde::json};
 use std::{process::Command, sync::Once};
 
@@ -23,12 +23,19 @@ fn new_user() -> UserDTO {
     }
 }
 
+fn test_recipe() -> RecipeDTO {
+    RecipeDTO {
+        title: String::from("TEST_RECIPE"),
+        content: String::from("TEST_CONTENT"),
+    }
+}
+
 static INIT: Once = Once::new();
 
 async fn initialize() -> Client {
     INIT.call_once(|| {
         Command::new("sqlx")
-            .args(["database", "reset"])
+            .args(["database", "reset", "-y"])
             .output()
             .expect("failed to reset database");
     });
@@ -87,4 +94,20 @@ async fn register() {
         .dispatch()
         .await;
     assert_eq!(req.status(), Status::Unauthorized, "register existing user");
+}
+
+#[async_test]
+async fn post_new_recipe() {
+    let client = initialize().await;
+
+    //TODO: send the cookie so this test succeeds
+    let req = client
+        .post("/api/recipe")
+        .body(json::to_string(&test_recipe()).unwrap())
+        .dispatch()
+        .await;
+    assert_eq!(req.status(), Status::Ok);
+    let body = req.into_string().await.unwrap();
+    dbg!(&body);
+    assert!(json::from_str::<u64>(&body).is_ok())
 }

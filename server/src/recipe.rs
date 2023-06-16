@@ -1,5 +1,5 @@
 use crate::schema::{Paginated, RecipeDetails, RecipePreview, User};
-use rocket::{http::Status, serde::Deserialize};
+use rocket::{http::Status, serde::{Deserialize, Serialize}};
 use sqlx::{pool::PoolConnection, Connection, MySql};
 
 pub mod routes;
@@ -7,7 +7,7 @@ pub mod routes;
 #[cfg(test)]
 mod tests;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct RecipeDTO {
     pub title: String,
