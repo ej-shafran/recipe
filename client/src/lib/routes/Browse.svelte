@@ -6,6 +6,7 @@
   import Loading from "../components/Loading.svelte";
   import type { Paginated } from "../common/dto/Paginated.dto";
   import type { RecipePreviewDTO } from "../common/dto/RecipePreview.dto";
+  import NewRecipe from "../components/NewRecipe.svelte";
 
   const limit = 2;
 
@@ -48,3 +49,7 @@
 {#if $query.hasNextPage}
   <button on:click={() => $query.fetchNextPage()}>Next Page</button>
 {/if}
+
+<br />
+
+<NewRecipe />
