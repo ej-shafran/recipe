@@ -47,13 +47,12 @@ pub async fn read_many(
             c.content AS content,
             u.id AS poster_id,
             u.username AS `poster_name!`
-         FROM (SELECT id, content, recipe_id, user_id FROM comment LIMIT ? OFFSET ?) AS c
+         FROM (SELECT id, content, recipe_id, user_id FROM comment WHERE recipe_id = ? LIMIT ? OFFSET ?) AS c
          JOIN user AS u
-         ON u.id = c.user_id
-         WHERE recipe_id = ?;",
+         ON u.id = c.user_id;",
+        recipe_id,
         limit,
         (page - 1) * (limit as u32),
-        recipe_id
     );
 
     let rows = query
@@ -64,7 +63,10 @@ pub async fn read_many(
             _ => Status::InternalServerError,
         })?;
 
-    let query = sqlx::query!("SELECT COUNT(id) AS `count: u32` FROM comment;");
+    let query = sqlx::query!(
+        "SELECT COUNT(id) AS `count: u32` FROM comment WHERE recipe_id = ?;",
+        recipe_id
+    );
 
     let count = query
         .fetch_one(&mut transaction)
