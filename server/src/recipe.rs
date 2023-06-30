@@ -80,7 +80,7 @@ pub async fn read_previews(
             u.id AS poster_id,
             u.username AS `poster_name!`,
             COUNT(c.id) AS `comment_count: u64`
-         FROM (SELECT id, title, user_id FROM recipe LIMIT ? OFFSET ?) AS r
+         FROM (SELECT id, title, user_id FROM recipe ORDER BY id DESC LIMIT ? OFFSET ?) AS r
          JOIN user AS u
          ON r.user_id = u.id
          LEFT JOIN comment AS c

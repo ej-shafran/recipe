@@ -47,7 +47,18 @@ pub async fn read_many(
             c.content AS content,
             u.id AS poster_id,
             u.username AS `poster_name!`
-         FROM (SELECT id, content, recipe_id, user_id FROM comment WHERE recipe_id = ? LIMIT ? OFFSET ?) AS c
+         FROM (
+            SELECT 
+                id,
+                content,
+                recipe_id,
+                user_id
+            FROM comment
+            WHERE recipe_id = ?
+            ORDER BY id DESC
+            LIMIT ?
+            OFFSET ?
+        ) AS c
          JOIN user AS u
          ON u.id = c.user_id;",
         recipe_id,
