@@ -4,6 +4,7 @@
   import type { Paginated } from "../common/dto/Paginated.dto";
   import type { Comment } from "../common/dto/Comment.dto";
   import CommentPreview from "./CommentPreview.svelte";
+  import NewComment from "./NewComment.svelte";
 
   export let id: string;
 
@@ -36,6 +37,9 @@
   </div>
 {:else}
   <h3>Comments</h3>
+
+  <NewComment {id} />
+
   {#each $query.data.pages.flatMap((page) => page.results) as comment}
     <CommentPreview {comment} />
   {/each}

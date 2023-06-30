@@ -7,7 +7,6 @@
   import RecipeDetails from "../components/RecipeDetails.svelte";
   import type { RecipeDetailsDTO } from "../common/dto/RecipeDetails.dto";
   import RecipeComments from "../components/RecipeComments.svelte";
-  import NewComment from "../components/NewComment.svelte";
 
   export let id: string;
 
@@ -37,7 +36,5 @@
 {/if}
 
 <RecipeComments {id} />
-
-<NewComment {id} />
 
 <Link to="/browse">Back to Browse</Link>
