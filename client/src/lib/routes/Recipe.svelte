@@ -6,6 +6,7 @@
   import Loading from "../components/Loading.svelte";
   import RecipeDetails from "../components/RecipeDetails.svelte";
   import type { RecipeDetailsDTO } from "../common/dto/RecipeDetails.dto";
+  import RecipeComments from "../components/RecipeComments.svelte";
 
   export let id: string;
 
@@ -33,5 +34,7 @@
 {:else}
   <RecipeDetails recipeDetails={$query.data} />
 {/if}
+
+<RecipeComments {id} />
 
 <Link to="/browse">Back to Browse</Link>
