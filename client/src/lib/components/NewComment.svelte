@@ -44,7 +44,8 @@
 </script>
 
 <form action="#" on:submit|preventDefault={handleSubmit}>
-  <input bind:value />
+  <label for="new-comment">Add a new comment</label>
+  <textarea bind:value id="new-comment" />
 
   {#if !!error}
     <p>{error}</p>
