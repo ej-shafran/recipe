@@ -10,8 +10,6 @@ if (!AUTH_COOKIE) {
 export function getUserId(): string | null {
   const cookie = cookieJar.get(AUTH_COOKIE);
 
-  if (cookie) console.log(decode(cookie));
-
   return cookie ? decode<{ id: string }>(cookie).id : null;
 }
 
