@@ -13,7 +13,7 @@
     password: false,
   };
 
-  let errors = {} as UserFormErrors;
+  let errors: UserFormErrors = {};
 
   let username = "";
   let password = "";
@@ -30,7 +30,7 @@
     if (!validation.success) {
       errors = validation.error.format();
     } else {
-      errors = {} as UserFormErrors;
+      errors = {};
     }
 
     return validation.success;

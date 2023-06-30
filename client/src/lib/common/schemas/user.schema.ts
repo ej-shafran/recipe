@@ -7,4 +7,4 @@ export const userSchema = z.object({
 
 export type UserValues = z.infer<typeof userSchema>;
 
-export type UserFormErrors = z.ZodFormattedError<UserValues>;
+export type UserFormErrors = Partial<z.ZodFormattedError<UserValues>>;
