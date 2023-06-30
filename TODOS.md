@@ -5,7 +5,7 @@
 - [x] Set up project structure with Svelte (SvelteKit?).
 - [ ] Design and create the user interface for the recipe browsing page.
 - [x] Implement user registration and login forms.
-- [ ] Create the recipe details page with all the necessary information.
+- [x] Create the recipe details page with all the necessary information.
 - [ ] Implement the functionality to save recipes as favorites.
 - [ ] Design and implement the user profile page.
 - [ ] Ensure the application is responsive and works well on different devices.
@@ -14,15 +14,15 @@
 ### Pages
 
 - [ ] Recipe browsing page
-    - [ ] Markup
+    - [x] Markup
     - [ ] Logic
     - [ ] Style
 - [ ] Register & Login page
-    - [ ] Markup
+    - [x] Markup
     - [x] Logic
     - [ ] Style
 - [ ] Recipe Details page
-    - [ ] Markup
+    - [x] Markup
     - [ ] Logic
     - [ ] Style
 - [ ] User Profile page
