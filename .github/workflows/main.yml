@@ -56,6 +56,10 @@ jobs:
       run: cargo run &
       working-directory: ./server
       
+    - uses: iFaxity/wait-on-action@v1.1.0
+      with:
+        resource: http://localhost:8000
+      
     - name: Cypress (E2E)
       uses: cypress-io/github-action@v5
       with:
