@@ -35,7 +35,7 @@ static INIT: Once = Once::new();
 async fn initialize() -> Client {
     INIT.call_once(|| {
         Command::new("sqlx")
-            .args(["database", "reset", "-y"])
+            .args(["database", "reset", "-y", "--source", "./migrations/test"])
             .output()
             .expect("failed to reset database");
     });
@@ -47,6 +47,7 @@ async fn initialize() -> Client {
 async fn login() {
     let client = initialize().await;
 
+    dbg!(json::to_string(&test_user()).unwrap());
     let req = client
         .post("/api/user/login")
         .body(json::to_string(&test_user()).unwrap())
