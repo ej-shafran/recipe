@@ -9,25 +9,11 @@
   import Form from "../common/forms/Form.svelte";
   import Field from "../common/forms/Field.svelte";
   import SubmitButton from "../common/forms/SubmitButton.svelte";
-
-  const CONFIRM_ERROR = {
-    message: "Passwords must match.",
-    path: ["confirmPassword"],
-  };
-
-  const schema = z
-    .object({
-      username: z.string().min(5).max(30),
-      password: z.string().min(5).max(100),
-      confirmPassword: z.string().min(5).max(100),
-    })
-    .refine((schema) => {
-      return schema.password === schema.confirmPassword;
-    }, CONFIRM_ERROR);
+  import { schemas } from "../common/forms/schemas";
 
   const mutation = createMutation({
     mutationKey: ["register"],
-    mutationFn: async (values: z.infer<typeof schema>) => {
+    mutationFn: async (values: z.infer<typeof schemas.register>) => {
       await axios.post("/api/user/register", values);
     },
     onSuccess: () => {
@@ -35,7 +21,7 @@
     },
   });
 
-  const form = createForm(schema, mutation);
+  const form = createForm(schemas.register, mutation);
   const { store } = form;
 </script>
 

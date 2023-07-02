@@ -1,23 +1,19 @@
 <script lang="ts">
+  import { z } from "zod";
   import axios from "axios";
   import { navigate } from "svelte-navigator";
   import { createMutation } from "@tanstack/svelte-query";
   import { getUserId } from "../common/functions/auth.functions";
 
-  import { z } from "zod";
   import { createForm } from "../common/forms/createForm";
   import Form from "../common/forms/Form.svelte";
   import Field from "../common/forms/Field.svelte";
   import SubmitButton from "../common/forms/SubmitButton.svelte";
-
-  const schema = z.object({
-    username: z.string().min(5).max(30),
-    password: z.string().min(5).max(100),
-  });
+  import { schemas } from "../common/forms/schemas";
 
   const mutation = createMutation({
     mutationKey: ["login"],
-    mutationFn: async (values: z.infer<typeof schema>) => {
+    mutationFn: async (values: z.infer<typeof schemas.credentials>) => {
       await axios.post("/api/user/login", values);
     },
     onSuccess: () => {
@@ -25,7 +21,7 @@
     },
   });
 
-  const form = createForm(schema, mutation);
+  const form = createForm(schemas.credentials, mutation);
   const { store } = form;
 </script>
 
