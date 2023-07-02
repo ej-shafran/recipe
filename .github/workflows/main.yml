@@ -47,12 +47,16 @@ jobs:
     - name: Migrate Database
       run: |
         cargo install sqlx-cli --features mysql
-        sqlx database reset
+        sqlx database reset --source ./migrations/test
       working-directory: ./server
       
     - name: Tests (Server)
       run: cargo test -- --include-ignored
       working-directory: ./server
+      
+    - name: Compile (Client)
+      run: npm run check
+      working-directory: ./client
       
     - name: Run Server In Background
       run: cargo run &
