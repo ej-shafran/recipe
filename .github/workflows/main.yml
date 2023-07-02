@@ -54,10 +54,6 @@ jobs:
       run: cargo test -- --include-ignored
       working-directory: ./server
       
-    - name: Compile (Client)
-      run: npm run check
-      working-directory: ./client
-      
     - name: Run Server In Background
       run: cargo run &
       working-directory: ./server
@@ -67,3 +63,7 @@ jobs:
       with:
           working-directory: ./client
           start: npm run dev
+          
+    - name: Compile (Client)
+      run: npm run check
+      working-directory: ./client
