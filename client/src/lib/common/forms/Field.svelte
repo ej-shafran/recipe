@@ -41,13 +41,13 @@
     key as FormKey<ToErrors<Values>>
   ) as ToErrors<Values>;
   let value = getIn($store.values, key);
-  const unsubscribe = store.subscribe((form) => {
-    touched = getIn(form.touched, key) as boolean;
+  const unsubscribe = store.subscribe((store) => {
+    touched = getIn(store.touched, key) as boolean;
     error = getIn(
-      form.errors,
+      store.errors,
       key as FormKey<ToErrors<Values>>
     ) as ToErrors<Values>;
-    value = getIn(form.values, key);
+    value = getIn(store.values, key);
   });
   onDestroy(unsubscribe);
 
