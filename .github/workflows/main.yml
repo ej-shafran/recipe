@@ -57,6 +57,7 @@ jobs:
         cd ./server
         cargo run &
         cd ../client
+        npm ci
         npm run dev && sleep 5
         npx cypress run
           
