@@ -28,9 +28,13 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+    - name: Setup Rust Toolchain
+      run: rustup toolchain install stable --profile minimal
+    - name: Cache Rust Dependencies
+      uses: Swatinem/rust-cache@v2
     - name: Migrate Database
       run: |
-        cargo install sqlx-cli --no-default-features --features mysql
+        cargo install sqlx-cli --features mysql
         sqlx database reset
     - name: Build
       run: cargo build --verbose
