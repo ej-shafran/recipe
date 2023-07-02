@@ -1,3 +1,6 @@
+/// <reference types="cypress" />
+
+
 import { errors } from "../../src/lib/common/forms/errors";
 
 const SELECTORS = (() => {
