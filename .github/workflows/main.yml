@@ -15,28 +15,9 @@ env:
   AUTH_COOKIE: "T3STKR4Zy"
   SECRET_KEY: "UdGwDamlWn1xpxUS9QrOO7NOcOFO5QcSRSF8Av6bDW4="
 
-jobs:
-  e2e:
-    name: Test End-to-end (Client)
-    runs-on: ubuntu-latest
-    needs: [server]
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        
-      - name: Run Server In Background
-        working-directory: ./server
-        run: cargo run &
-        
-      - name: Cypress
-        uses: cypress-io/github-action@v5
-        with:
-          working-directory: ./client
-          start: npm run dev
-    
-  server:
-    name: Test Server
+jobs:   
+  end-to-end:
+    name: Test End-To-End
     runs-on: ubuntu-latest
     
     services:
@@ -51,24 +32,26 @@ jobs:
 
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      
-    - name: Setup Rust Toolchain
-      run: rustup toolchain install stable --profile minimal
-      
-    - name: Cache Rust Dependencies
-      uses: Swatinem/rust-cache@v2
-      
-    - name: Run sccache-cache
-      uses: mozilla-actions/sccache-action@v0.0.3
-      
+    - uses: actions/checkout@v3
+    - run: rustup toolchain install stable --profile minimal
+    - uses: Swatinem/rust-cache@v2
+    - uses: mozilla-actions/sccache-action@v0.0.3
+    
     - name: Migrate Database
       run: |
         cargo install sqlx-cli --features mysql
         sqlx database reset
       working-directory: ./server
       
-    - name: Run tests
+    - name: Tests (Server)
       run: cargo test -- --include-ignored
       working-directory: ./server
+      
+    - run: cargo run &
+      working-directory: ./server
+      
+    - name: Cypress (E2E)
+      uses: cypress-io/github-action@v5
+      with:
+          working-directory: ./client
+          start: npm run dev
