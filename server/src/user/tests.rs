@@ -3,6 +3,7 @@ use sqlx::MySqlPool;
 
 #[sqlx::test]
 #[ignore]
+#[serial_test::serial]
 async fn register_and_login(pool: MySqlPool) {
     let mut db = pool.acquire().await.expect("valid connection");
 

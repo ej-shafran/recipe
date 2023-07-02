@@ -20,6 +20,7 @@ async fn get_user_id(db: &mut PoolConnection<MySql>) -> String {
 
 #[sqlx::test]
 #[ignore]
+#[serial_test::serial]
 async fn creates_and_reads_details(pool: MySqlPool) {
     let mut db = pool.acquire().await.unwrap();
 
@@ -40,6 +41,7 @@ async fn creates_and_reads_details(pool: MySqlPool) {
 
 #[sqlx::test]
 #[ignore]
+#[serial_test::serial]
 async fn reads_previews(pool: MySqlPool) {
     let mut db = pool.acquire().await.unwrap();
 
@@ -75,6 +77,7 @@ async fn reads_previews(pool: MySqlPool) {
 
 #[sqlx::test]
 #[ignore]
+#[serial_test::serial]
 async fn deletes(pool: MySqlPool) {
     let mut db = pool.acquire().await.unwrap();
 

@@ -100,10 +100,20 @@ async fn register() {
 async fn post_new_recipe() {
     let client = initialize().await;
 
+    let response = client
+        .post("/api/user/login")
+        .body(json::to_string(&test_user()).unwrap())
+        .dispatch()
+        .await;
+
+    let auth_cookie_name = std::env::var("AUTH_COOKIE").unwrap();
+    let cookie = response.cookies().get(&auth_cookie_name).unwrap();
+
     //TODO: send the cookie so this test succeeds
     let req = client
         .post("/api/recipe")
         .body(json::to_string(&test_recipe()).unwrap())
+        .header(cookie)
         .dispatch()
         .await;
     assert_eq!(req.status(), Status::Ok);

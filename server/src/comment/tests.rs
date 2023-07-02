@@ -25,6 +25,7 @@ async fn get_recipe_id(db: &mut PoolConnection<MySql>) -> (u64, String) {
 
 #[sqlx::test]
 #[ignore]
+#[serial_test::serial]
 async fn reads_previews(pool: MySqlPool) {
     let mut db = pool.acquire().await.unwrap();
     let (recipe_id, user_id) = get_recipe_id(&mut db).await;
