@@ -60,7 +60,11 @@ jobs:
       uses: cypress-io/github-action@v5
       with:
           working-directory: ./client
-          start: npm run dev
+          start: |
+            cd ../server
+            cargo run &
+            cd ../client
+            npm run dev
           wait-on: http://localhost:8000
           
     - name: Compile (Client)
