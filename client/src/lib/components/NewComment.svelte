@@ -6,18 +6,15 @@
   import { createForm } from "../common/forms/createForm";
   import Form from "../common/forms/Form.svelte";
   import Field from "../common/forms/Field.svelte";
+  import { schemas } from "../common/forms/schemas";
 
   export let id: string;
-
-  const schema = z.object({
-    content: z.string().min(10).max(255),
-  });
 
   const queryClient = useQueryClient();
 
   const mutation = createMutation({
     mutationKey: ["new-comment", id],
-    mutationFn: async (values: z.infer<typeof schema>) => {
+    mutationFn: async (values: z.infer<typeof schemas.comment>) => {
       await axios({
         method: "POST",
         url: `/api/comment/${id}`,
@@ -32,7 +29,7 @@
     },
   });
 
-  const form = createForm(schema, mutation);
+  const form = createForm(schemas.comment, mutation);
   const { store, reset } = form;
 </script>
 

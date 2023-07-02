@@ -7,15 +7,11 @@
   import { createForm } from "../common/forms/createForm";
   import Form from "../common/forms/Form.svelte";
   import Field from "../common/forms/Field.svelte";
-
-  export const schema = z.object({
-    title: z.string().min(10).max(180),
-    content: z.string().min(20).max(3000),
-  });
+  import { schemas } from "../common/forms/schemas";
 
   const mutation = createMutation({
     mutationKey: ["new-recipe"],
-    mutationFn: async (recipe: z.infer<typeof schema>) => {
+    mutationFn: async (recipe: z.infer<typeof schemas.recipe>) => {
       const { data } = await axios<number>({
         method: "POST",
         url: "/api/recipe",
@@ -29,7 +25,7 @@
     },
   });
 
-  const form = createForm(schema, mutation);
+  const form = createForm(schemas.recipe, mutation);
   const { store } = form;
 </script>
 

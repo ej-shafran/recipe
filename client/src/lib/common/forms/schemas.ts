@@ -26,4 +26,13 @@ export namespace schemas {
       message: errors.confirm(),
       path: ["confirmPassword"],
     });
+
+  export const comment = z.object({
+    content: z.string().min(10).max(255),
+  });
+
+  export const recipe = z.object({
+    title: z.string().min(10).max(180),
+    content: z.string().min(20).max(3000),
+  });
 }
