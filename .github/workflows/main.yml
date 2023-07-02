@@ -58,7 +58,8 @@ jobs:
         cargo run &
         cd ../client
         npm ci
-        npm run dev && sleep 5
+        npm run dev &
+        sleep 3
         npx cypress run
           
     - name: Compile (Client)
