@@ -25,7 +25,7 @@
       if (error.response?.status === 401) {
         $store.errors = {
           username: { _errors: [errors.invalidCredentials()] },
-        } as any;
+        };
       }
     },
   });
