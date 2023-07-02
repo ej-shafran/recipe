@@ -11,6 +11,9 @@ env:
   RUSTC_WRAPPER: "sccache"
   CARGO_TERM_COLOR: always
   DATABASE_URL: mysql://root:rootpassword@localhost/test_db
+  ROCKET_DATABASES: "{recipe_db={url=\"mysql://root:rootpassword@localhost/test_db\"}}"
+  AUTH_COOKIE: "T3STKR4Zy"
+  SECRET_KEY: "UdGwDamlWn1xpxUS9QrOO7NOcOFO5QcSRSF8Av6bDW4="
 
 jobs:
   test:
@@ -46,10 +49,6 @@ jobs:
         sqlx database reset
       working-directory: ./server
       
-    - name: Build
-      run: cargo build
-      working-directory: ./server
-      
     - name: Run tests
-      run: cargo test --verbose -- --include-ignored
+      run: cargo test -- --include-ignored
       working-directory: ./server
