@@ -3,53 +3,41 @@
   import axios from "axios";
   import { z } from "zod";
 
+  import { createForm } from "../common/forms/createForm";
+  import Form from "../common/forms/Form.svelte";
+  import Field from "../common/forms/Field.svelte";
+
   export let id: string;
 
-  const schema = z.string().min(10).max(255);
-
-  let value = "";
-  let error: string | null = null;
+  const schema = z.object({
+    content: z.string().min(10).max(255),
+  });
 
   const queryClient = useQueryClient();
 
   const mutation = createMutation({
     mutationKey: ["new-comment", id],
-    mutationFn: async (content: string) => {
+    mutationFn: async (values: z.infer<typeof schema>) => {
       await axios({
         method: "POST",
         url: `/api/comment/${id}`,
-        data: {
-          content,
-        },
+        data: values,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["comments", id]);
     },
     onSettled: () => {
-      value = "";
+      reset();
     },
   });
 
-  function handleSubmit() {
-    const validation = schema.safeParse(value);
-
-    if (!validation.success) {
-      error = validation.error.format()._errors.join(", ");
-    } else {
-      error = null;
-      $mutation.mutate(value);
-    }
-  }
+  const form = createForm(schema, mutation);
+  const { store, reset } = form;
 </script>
 
-<form action="#" on:submit|preventDefault={handleSubmit}>
-  <label for="new-comment">Add a new comment</label>
-  <textarea bind:value id="new-comment" />
+<Form {...form}>
+  <Field {store} key={["content"]} />
 
-  {#if !!error}
-    <p>{error}</p>
-  {/if}
-
-  <button type="submit">Submit</button>
-</form>
+  <button type="submit">Comment</button>
+</Form>

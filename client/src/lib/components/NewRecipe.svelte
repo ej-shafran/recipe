@@ -1,26 +1,21 @@
 <script lang="ts">
+  import { z } from "zod";
   import { createMutation } from "@tanstack/svelte-query";
-  import { recipeSchema } from "../common/schemas/recipe.schema";
-  import type {
-    RecipeFormErrors,
-    RecipeValues,
-  } from "../common/schemas/recipe.schema";
   import axios from "axios";
   import { navigate } from "svelte-navigator";
 
-  const touched = {
-    title: false,
-    content: false,
-  };
+  import { createForm } from "../common/forms/createForm";
+  import Form from "../common/forms/Form.svelte";
+  import Field from "../common/forms/Field.svelte";
 
-  let title = "";
-  let content = "";
-
-  let errors: RecipeFormErrors = {};
+  export const schema = z.object({
+    title: z.string().min(10).max(180),
+    content: z.string().min(20).max(3000),
+  });
 
   const mutation = createMutation({
     mutationKey: ["new-recipe"],
-    mutationFn: async (recipe: RecipeValues) => {
+    mutationFn: async (recipe: z.infer<typeof schema>) => {
       const { data } = await axios<number>({
         method: "POST",
         url: "/api/recipe",
@@ -34,60 +29,15 @@
     },
   });
 
-  function handleSubmit() {
-    if (!validate(title, content)) return;
-
-    $mutation.mutate({ title, content });
-  }
-
-  function touch(key: keyof RecipeValues) {
-    if (!touched[key]) touched[key] = true;
-  }
-
-  function validate(title: string, content: string) {
-    const validation = recipeSchema.safeParse({ title, content });
-
-    if (!validation.success) {
-      errors = validation.error.format();
-    } else {
-      errors = {};
-    }
-
-    return validation.success;
-  }
-
-  $: validate(title, content);
+  const form = createForm(schema, mutation);
+  const { store } = form;
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
-  <div>
-    <label for="title"> Title: </label>
-    <input
-      id="title"
-      type="text"
-      bind:value={title}
-      on:blur={() => touch("title")}
-    />
-    <span>
-      {#if touched.title}
-        {errors?.title?._errors ?? ""}
-      {/if}
-    </span>
-  </div>
-
-  <div>
-    <label for="content"> Content: </label>
-    <textarea
-      id="content"
-      bind:value={content}
-      on:blur={() => touch("content")}
-    />
-    <span>
-      {#if touched.content}
-        {errors?.content?._errors ?? ""}
-      {/if}
-    </span>
-  </div>
+<Form {...form}>
+  <Field {store} key={["title"]} label="Title:" />
+  <Field {store} key={["content"]} let:attributes label="Content:">
+    <textarea use:attributes />
+  </Field>
 
   <button type="submit">Submit</button>
-</form>
+</Form>
