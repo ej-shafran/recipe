@@ -1,0 +1,55 @@
+name: Server Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
+  CARGO_TERM_COLOR: always
+  DATABASE_URL: mysql://root:rootpassword@localhost/test_db
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_DATABASE: test_db
+          MYSQL_ROOT_PASSWORD: rootpassword
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Setup Rust Toolchain
+      run: rustup toolchain install stable --profile minimal
+      
+    - name: Cache Rust Dependencies
+      uses: Swatinem/rust-cache@v2
+      
+    - name: Run sccache-cache
+      uses: mozilla-actions/sccache-action@v0.0.3
+      
+    - name: Migrate Database
+      run: |
+        cargo install sqlx-cli --features mysql
+        sqlx database reset
+      working-directory: ./server
+      
+    - name: Build
+      run: cargo build
+      working-directory: ./server
+      
+    - name: Run tests
+      run: cargo test --verbose -- --include-ignored
+      working-directory: ./server
