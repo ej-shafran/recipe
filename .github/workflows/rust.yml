@@ -8,15 +8,30 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  DATABASE_URL: mysql://user:password@localhost/test_db
 
 jobs:
-  build:
-
+  test:
+    name: Test
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: rootpassword
+        ports:
+          - 3306:3306
 
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+    - name: Migrate Database
+      run: |
+        cargo install sqlx-cli --no-default-features --features mysql
+        sqlx database reset
     - name: Build
       run: cargo build --verbose
       working-directory: ./server
