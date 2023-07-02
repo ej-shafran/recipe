@@ -7,6 +7,8 @@ on:
     branches: [ "main" ]
 
 env:
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
   CARGO_TERM_COLOR: always
   DATABASE_URL: mysql://root:rootpassword@localhost/test_db
 
@@ -28,18 +30,26 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+      
     - name: Setup Rust Toolchain
       run: rustup toolchain install stable --profile minimal
+      
     - name: Cache Rust Dependencies
       uses: Swatinem/rust-cache@v2
+      
+    - name: Run sccache-cache
+      uses: mozilla-actions/sccache-action@v0.0.3
+      
     - name: Migrate Database
       run: |
         cargo install sqlx-cli --features mysql
         sqlx database reset
       working-directory: ./server
+      
     - name: Build
-      run: cargo build --verbose
+      run: cargo build
       working-directory: ./server
+      
     - name: Run tests
       run: cargo test --verbose -- --include-ignored
       working-directory: ./server
