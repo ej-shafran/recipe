@@ -4,7 +4,9 @@
 
   type Values = $$Generic<Record<PropertyKey, any>>;
 
-  interface $$Props extends FormResult<Values> {}
+  interface $$Props extends FormResult<Values> {
+    "data-cy"?: string;
+  }
 
   export let handleSubmit: FormResult<Values>["handleSubmit"];
   export let validate: FormResult<Values>["validate"];
@@ -20,7 +22,7 @@
   $: validate($store.values);
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
+<form on:submit|preventDefault={handleSubmit} data-cy={$$restProps["data-cy"]}>
   <slot />
 </form>
 

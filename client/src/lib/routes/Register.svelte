@@ -8,6 +8,7 @@
   import { createForm } from "../common/forms/createForm";
   import Form from "../common/forms/Form.svelte";
   import Field from "../common/forms/Field.svelte";
+  import SubmitButton from "../common/forms/SubmitButton.svelte";
 
   const CONFIRM_ERROR = {
     message: "Passwords must match.",
@@ -39,7 +40,7 @@
 </script>
 
 <h1>Register Page</h1>
-<Form {...form}>
+<Form {...form} data-cy="REGISTER_FORM">
   <Field {store} key={["username"]} label="Enter a username:" />
 
   <Field {store} key={["password"]} let:attributes>
@@ -52,5 +53,5 @@
     <input use:attributes type="password" />
   </Field>
 
-  <button type="submit">Register</button>
+  <SubmitButton>Register</SubmitButton>
 </Form>
