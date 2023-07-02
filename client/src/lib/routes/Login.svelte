@@ -1,6 +1,7 @@
 <script lang="ts">
   import { z } from "zod";
   import axios from "axios";
+  import type { AxiosError } from "axios";
   import { navigate } from "svelte-navigator";
   import { createMutation } from "@tanstack/svelte-query";
   import { getUserId } from "../common/functions/auth.functions";
@@ -10,6 +11,7 @@
   import Field from "../common/forms/Field.svelte";
   import SubmitButton from "../common/forms/SubmitButton.svelte";
   import { schemas } from "../common/forms/schemas";
+  import { errors } from "../common/forms/errors";
 
   const mutation = createMutation({
     mutationKey: ["login"],
@@ -18,6 +20,13 @@
     },
     onSuccess: () => {
       navigate(`/user/${getUserId()}`);
+    },
+    onError: (error: AxiosError) => {
+      if (error.response?.status === 401) {
+        $store.errors = {
+          username: { _errors: [errors.invalidCredentials()] },
+        } as any;
+      }
     },
   });
 

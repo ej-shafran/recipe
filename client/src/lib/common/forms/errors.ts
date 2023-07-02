@@ -16,6 +16,6 @@ export const errors = {
     return "The passwords should match";
   },
   invalidCredentials() {
-    return "TODO";
+    return "Invalid credentials. Please try again.";
   },
 };
