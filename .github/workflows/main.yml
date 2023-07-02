@@ -53,15 +53,12 @@ jobs:
       working-directory: ./server
       
     - name: Cypress (E2E)
-      uses: cypress-io/github-action@v5
-      with:
-          working-directory: ./client
-          start: |
-            cd ../server
-            cargo run &
-            cd ../client
-            npm run dev
-          wait-on: http://localhost:8000
+      run: |
+        cd ./server
+        cargo run &
+        cd ../client
+        npm run dev && sleep 5
+        npx cypress run
           
     - name: Compile (Client)
       run: npm run check
