@@ -22,10 +22,10 @@ const REGISTER_FORM_SELECTORS = (() => {
 })();
 
 Cypress.Commands.add("login", (username, password) => {
-  cy.visit("/login");
-  cy.get(LOGIN_FORM_SELECTORS.USERNAME_INPUT).type(username);
-  cy.get(LOGIN_FORM_SELECTORS.PASSWORD_INPUT).type(password);
-  cy.get(LOGIN_FORM_SELECTORS.SUBMIT_BUTTON).click();
+  cy.request("POST", "/api/user/login", {
+    username,
+    password,
+  });
 });
 
 Cypress.Commands.add("register", (username, password) => {
