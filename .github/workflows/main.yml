@@ -59,7 +59,7 @@ jobs:
     - name: Cypress (E2E)
       uses: cypress-io/github-action@v5
       with:
-        wait-on: 'http://127.0.0.1:8000, http://127.0.0.1:5173'
+        wait-on: 'http://127.0.0.1:8000'
         start: |
           npm run server
           npm run client
