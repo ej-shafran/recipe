@@ -9,7 +9,8 @@
     "cy:open": "npx cypress open"
   },
   "dependencies": {
-    "cypress": "^12.16.0"
+    "cypress": "^12.16.0",
+    "typescript": "^5.1.6"
   },
   "keywords": [],
   "author": "",
