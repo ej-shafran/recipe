@@ -26,7 +26,7 @@ const INVALID_CREDENTIALS = "Invalid credentials. Please try again.";
 
 describe("Register Page", () => {
   before(() => {
-    if (!cy.isCI()) {
+    if (Cypress.env("CYPRESS_CI") === "no") {
       cy.exec("sqlx database reset -y --source ./server/migrations/test");
     }
   });
@@ -43,12 +43,15 @@ describe("Register Page", () => {
   });
 
   it("should successfully add a new user with new values", () => {
+    cy.intercept("POST", "/api/user/register").as("register");
+
     cy.get(SELECTORS.USERNAME_INPUT).type(NEW_VALUES.USERNAME);
     cy.get(SELECTORS.PASSWORD_INPUT).type(NEW_VALUES.PASSWORD);
     cy.get(SELECTORS.CONFIRM_PASSWORD_INPUT).type(NEW_VALUES.PASSWORD);
     cy.get(SELECTORS.SUBMIT_BUTTON).click();
 
-    cy.get(SELECTORS.USERNAME_ERROR).should("not.contain", INVALID_CREDENTIALS);
+    cy.wait("@register");
+
     cy.login(NEW_VALUES.USERNAME, NEW_VALUES.PASSWORD)
       .its("status")
       .should("equal", 200);
