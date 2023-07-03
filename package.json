@@ -1,0 +1,13 @@
+{
+  "name": "recipe",
+  "version": "1.0.0",
+  "description": "A full-stack side project for me to learn `rocket.rs` and `SvelteJS`",
+  "main": "index.js",
+  "scripts": {
+    "server": "cd server; cargo run",
+    "client": "cd client; npm run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
