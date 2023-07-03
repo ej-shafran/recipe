@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "server": "cd server; cargo run",
-    "client": "cd client; npm run dev"
+    "client": "cd client; npm run dev",
+    "cy:open": "npx cypress open"
+  },
+  "dependencies": {
+    "cypress": "^12.16.0"
   },
   "keywords": [],
   "author": "",

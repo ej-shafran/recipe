@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 /// <reference path="../support/commands.ts" />
 
-import { errors } from "../../src/lib/common/forms/errors";
+import { errors } from "../../client/src/lib/common/forms/errors";
 
 const SELECTORS = (() => {
   const PARENT = "[data-cy=LOGIN_FORM]";
