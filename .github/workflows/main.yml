@@ -52,6 +52,10 @@ jobs:
       run: cargo test -- --include-ignored
       working-directory: ./server
       
+    - name: Install Dependencies (Client)
+      run: npm install
+      working-directory: ./client
+      
     - name: Cypress (E2E)
       uses: cypress-io/github-action@v5
       with:
