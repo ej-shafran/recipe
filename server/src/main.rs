@@ -26,7 +26,7 @@ fn launch() -> _ {
 fn health() {}
 
 pub fn rocket() -> Rocket<Build> {
-    let _ = dotenvy::from_filename(".env.ci");
+    let _ = dotenvy::from_filename("../../.env");
     let _ = dotenvy::dotenv();
 
     rocket::build()
