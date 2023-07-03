@@ -25,11 +25,9 @@ const NEW_VALUES = {
 const INVALID_CREDENTIALS = "Invalid credentials. Please try again.";
 
 describe("Register Page", () => {
-  before(() => {
-    if (Cypress.env("CYPRESS_CI") === "no") {
-      cy.exec("sqlx database reset -y --source ./server/migrations/test");
-    }
-  });
+  before(() =>
+    cy.exec("sqlx database reset -y --source ./server/migrations/test")
+  );
 
   beforeEach(() => cy.visit("/register"));
 
