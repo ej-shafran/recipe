@@ -25,9 +25,7 @@ const NEW_VALUES = {
 const INVALID_CREDENTIALS = "Invalid credentials. Please try again.";
 
 describe("Register Page", () => {
-  before(() =>
-    cy.exec("sqlx database reset -y --source ./server/migrations/test")
-  );
+  before(() => cy.resetDB());
 
   beforeEach(() => cy.visit("/register"));
 

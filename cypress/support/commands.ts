@@ -14,6 +14,10 @@ Cypress.Commands.add("register", (username, password) => {
   });
 });
 
+Cypress.Commands.add("resetDB", () => {
+  cy.exec("sqlx database reset -y --source ./server/migrations/test");
+});
+
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -25,6 +29,7 @@ declare global {
         username: string,
         password: string
       ): Chainable<Cypress.Response<unknown>>;
+      resetDB(): void;
     }
   }
 }
