@@ -7,6 +7,7 @@
   import { createForm } from "../common/forms/createForm";
   import Form from "../common/forms/Form.svelte";
   import Field from "../common/forms/Field.svelte";
+  import SubmitButton from "../common/forms/SubmitButton.svelte";
   import { schemas } from "../common/forms/schemas";
 
   const mutation = createMutation({
@@ -35,5 +36,5 @@
     <textarea use:attributes />
   </Field>
 
-  <button type="submit">Submit</button>
+  <SubmitButton>Submit</SubmitButton>
 </Form>

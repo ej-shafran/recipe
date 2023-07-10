@@ -41,7 +41,11 @@
   $: if (bottomOfList) observer.observe(bottomOfList);
 </script>
 
-<h1>Browse Page</h1>
+<h1 data-cy="BROWSE_HEADER">Browse Page</h1>
+
+<NewRecipe />
+
+<br />
 
 {#if $query.isLoading}
   <Loading />
@@ -52,14 +56,10 @@
 {:else}
   <ul>
     {#each $query.data.pages.flatMap((page) => page.results) as recipePreview}
-      <li>
+      <li data-cy="RECIPE_PREVIEW">
         <RecipePreview {recipePreview} />
       </li>
     {/each}
     <div bind:this={bottomOfList} />
   </ul>
 {/if}
-
-<br />
-
-<NewRecipe />
