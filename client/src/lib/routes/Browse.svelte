@@ -8,7 +8,7 @@
   import type { RecipePreviewDTO } from "../common/dto/RecipePreview.dto";
   import NewRecipe from "../components/NewRecipe.svelte";
 
-  const limit = 2;
+  const limit = 10;
 
   const query = createInfiniteQuery({
     queryKey: ["browse-recipe-previews"],
@@ -26,6 +26,19 @@
     },
     getNextPageParam: (last) => last.nextPage ?? undefined,
   });
+
+  let bottomOfList: HTMLDivElement | null = null;
+  const observer = new IntersectionObserver(
+    ([target]) => {
+      if (target.isIntersecting && $query.hasNextPage) $query.fetchNextPage();
+    },
+    {
+      root: null,
+      rootMargin: "200px",
+    }
+  );
+
+  $: if (bottomOfList) observer.observe(bottomOfList);
 </script>
 
 <h1>Browse Page</h1>
@@ -43,11 +56,8 @@
         <RecipePreview {recipePreview} />
       </li>
     {/each}
+    <div bind:this={bottomOfList} />
   </ul>
-{/if}
-
-{#if $query.hasNextPage}
-  <button on:click={() => $query.fetchNextPage()}>Next Page</button>
 {/if}
 
 <br />
