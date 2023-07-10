@@ -12,6 +12,7 @@ env:
   CARGO_TERM_COLOR: always
   DATABASE_URL: mysql://root:rootpassword@localhost/test_db
   ROCKET_DATABASES: "{recipe_db={url=\"mysql://root:rootpassword@localhost/test_db\"}}"
+  ROCKET_LOG_LEVEL: "off"
 
 jobs:   
   end-to-end:
@@ -62,7 +63,7 @@ jobs:
         wait-on: 'http://127.0.0.1:8000'
         start: |
           npm run server
-          npm run client
+          npm run client -- --logLevel=silent
           
     - name: Compile (Client)
       run: npm run check
