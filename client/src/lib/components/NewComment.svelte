@@ -6,6 +6,7 @@
   import { createForm } from "../common/forms/createForm";
   import Form from "../common/forms/Form.svelte";
   import Field from "../common/forms/Field.svelte";
+  import SubmitButton from "../common/forms/SubmitButton.svelte";
   import { schemas } from "../common/forms/schemas";
 
   export let id: string;
@@ -36,5 +37,5 @@
 <Form {...form}>
   <Field {store} key={["content"]} />
 
-  <button type="submit">Comment</button>
+  <SubmitButton>Comment</SubmitButton>
 </Form>
