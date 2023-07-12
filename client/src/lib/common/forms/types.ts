@@ -13,7 +13,7 @@ export type FormMutation<Values extends FormValues> =
 export type ToErrors<Values extends FormValues> = {
   _errors?: string[];
 } & {
-    [P in keyof Values]: Values[P] extends FormValues
+    [P in keyof Values]?: Values[P] extends FormValues
     ? { _errors?: string[] } & ToErrors<Values[P]>
     : { _errors?: string[] };
   };

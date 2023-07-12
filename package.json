@@ -1,0 +1,19 @@
+{
+  "name": "recipe",
+  "version": "1.0.0",
+  "description": "A full-stack side project for me to learn `rocket.rs` and `SvelteJS`",
+  "main": "index.js",
+  "scripts": {
+    "server": "cd server; cargo run",
+    "client": "cd client; npm run dev",
+    "cy:open": "npx cypress open"
+  },
+  "dependencies": {
+    "cypress": "^12.16.0",
+    "dotenv": "^16.3.1",
+    "typescript": "^5.1.6"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -6,7 +6,7 @@
 
 <hr />
 
-<div>
+<div data-cy="RECIPE_COMMENT">
   <h4>{comment.poster.username}</h4>
   <p>{comment.content}</p>
 </div>

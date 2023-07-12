@@ -22,10 +22,15 @@ fn launch() -> _ {
     rocket()
 }
 
+#[get("/")]
+fn health() {}
+
 pub fn rocket() -> Rocket<Build> {
+    let _ = dotenvy::from_filename("../../.env");
     let _ = dotenvy::dotenv();
 
     rocket::build()
+        .mount("/", routes![health])
         .mount("/api/user", user::routes::index())
         .mount("/api/recipe", recipe::routes::index())
         .mount("/api/comment", comment::routes::index())

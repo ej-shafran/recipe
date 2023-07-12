@@ -5,7 +5,7 @@
 </script>
 
 <div>
-  <h1>{recipeDetails.title}</h1>
+  <h1 data-cy="RECIPE_TITLE">{recipeDetails.title}</h1>
   <h2>by <span>{recipeDetails.poster.username}</span></h2>
 
   <p>{recipeDetails.content}</p>

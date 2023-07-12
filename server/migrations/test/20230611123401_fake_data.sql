@@ -1,6 +1,6 @@
 -- User Data
 INSERT INTO `user` VALUES 
-  ('dd009d50-f2b3-4191-acdd-52ac86c7c3a5','TEST_USER','$2b$10$b70fGa5Yug3nNcuvT8HJVeF.F5H5yGgIo1rjzhSOekPO7ITUmFwMS');
+  ('dd009d50-f2b3-4191-acdd-52ac86c7c3a5','TEST_USER','$2b$10$Ruq6gCuQgMd4Om2Kxx8t/uHh6LjCe41b9ARQYOEYB7JmFhqvEbQfC');
 
 -- Recipe Data
 INSERT INTO recipe (title, content, user_id) VALUES

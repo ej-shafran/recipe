@@ -81,6 +81,7 @@ export function setIn<T extends FormValues>(
   return res;
 }
 
+//TODO: fix some TypeScript here
 export function getIn<T extends FormValues>(obj: T, pathArray: FormKey<T>) {
   let result = obj;
   for (const key of pathArray) {

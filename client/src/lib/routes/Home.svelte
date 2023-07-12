@@ -2,5 +2,5 @@
   export let id: string;
 </script>
 
-<h1>Home Page</h1>
+<h1 data-cy="HOME_HEADER">Home Page</h1>
 <h2>{id}</h2>
