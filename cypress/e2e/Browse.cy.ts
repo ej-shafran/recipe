@@ -1,10 +1,7 @@
 /// <reference types="cypress" />
 /// <reference path="../support/commands.ts" />
 
-const TEST_USER = {
-  USERNAME: "TEST_USER",
-  PASSWORD: "12345678",
-};
+import { TEST_USER } from "../support/constants";
 
 const SELECTORS = {
   HEADER: "[data-cy=BROWSE_HEADER]",
@@ -14,12 +11,15 @@ const SELECTORS = {
   CONTENT_INPUT: "[data-cy=CONTENT]",
   SUBMIT_BUTTON: "[data-cy=SUBMIT]",
   RECIPE_TITLE: "[data-cy=RECIPE_TITLE]",
+  RECIPE_CONTENT: "[data-cy=RECIPE_CONTENT]",
   RECIPE_PREVIEW_LINK: "[data-cy=RECIPE_PREVIEW] a",
 };
 
 const VALUES = {
-  TITLE: "a!1".repeat(5),
-  CONTENT: "a!1 ".repeat(10),
+  TITLE:
+    "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
+  CONTENT:
+    "Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod.",
 };
 
 const RECIPE_LIMIT = 10;
@@ -42,6 +42,9 @@ describe("Browse Recipe Page", () => {
     cy.get(SELECTORS.RECIPE_TITLE)
       .should("exist")
       .should("contain", VALUES.TITLE);
+    cy.get(SELECTORS.RECIPE_CONTENT)
+      .should("exist")
+      .should("contain", VALUES.CONTENT);
   });
 
   it("links to recipe details", () => {

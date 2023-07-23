@@ -1,7 +1,4 @@
-const TEST_USER = {
-  USERNAME: "TEST_USER",
-  PASSWORD: "12345678",
-};
+import { TEST_USER } from "../support/constants";
 
 const SELECTORS = {
   RECIPE_PREVIEW_LINK: "[data-cy=RECIPE_PREVIEW] a",

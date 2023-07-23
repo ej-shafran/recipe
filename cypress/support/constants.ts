@@ -1,0 +1,9 @@
+export const TEST_USER = {
+  USERNAME: "TEST_USER",
+  PASSWORD: "12345678",
+}
+
+export const INVALID_USER = {
+  USERNAME: "INVALID",
+  PASSWORD: "DOESNTEXIST",
+}
