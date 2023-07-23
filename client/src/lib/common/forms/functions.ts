@@ -81,7 +81,10 @@ export function setIn<T extends FormValues>(
   return res;
 }
 
-export function getIn<T extends FormValues>(obj: T, pathArray: FormKey<T>) {
+export function getIn<TObj extends FormValues, TResult = any>(
+  obj: TObj,
+  pathArray: FormKey<TObj>
+): TResult {
   let result = obj;
   for (const key of pathArray) {
     if (!result) break;

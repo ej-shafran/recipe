@@ -35,7 +35,7 @@ static INIT: Once = Once::new();
 async fn initialize() -> Client {
     INIT.call_once(|| {
         Command::new("sqlx")
-            .args(["database", "reset", "-y"])
+            .args(["database", "reset", "-y", "--source", "./migrations/test"])
             .output()
             .expect("failed to reset database");
     });
@@ -109,7 +109,6 @@ async fn post_new_recipe() {
     let auth_cookie_name = std::env::var("AUTH_COOKIE").unwrap();
     let cookie = response.cookies().get(&auth_cookie_name).unwrap();
 
-    //TODO: send the cookie so this test succeeds
     let req = client
         .post("/api/recipe")
         .body(json::to_string(&test_recipe()).unwrap())
@@ -117,7 +116,7 @@ async fn post_new_recipe() {
         .dispatch()
         .await;
     assert_eq!(req.status(), Status::Ok);
+
     let body = req.into_string().await.unwrap();
-    dbg!(&body);
     assert!(json::from_str::<u64>(&body).is_ok())
 }

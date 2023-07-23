@@ -14,25 +14,30 @@
 ### Pages
 
 - [ ] Recipe browsing page
-    - [x] Markup
-    - [ ] Logic
-    - [ ] Style
+  - [x] Markup
+  - [ ] Logic
+  - [ ] Style
+  - [x] E2E Test
 - [ ] Register & Login page
-    - [x] Markup
-    - [x] Logic
-    - [ ] Style
+  - [x] Markup
+  - [x] Logic
+  - [ ] Style
+  - [x] E2E Test
 - [ ] Recipe Details page
-    - [x] Markup
-    - [ ] Logic
-    - [ ] Style
+  - [x] Markup
+  - [ ] Logic
+  - [ ] Style
+  - [x] E2E Test
 - [ ] User Profile page
-    - [ ] Markup
-    - [ ] Logic
-    - [ ] Style
+  - [ ] Markup
+  - [ ] Logic
+  - [ ] Style
+  - [ ] E2E Test
 - [ ] User Home page
-    - [ ] Markup
-    - [ ] Logic
-    - [ ] Style
+  - [ ] Markup
+  - [ ] Logic
+  - [ ] Style
+  - [ ] E2E Test
 
 ## Back-end
 
@@ -42,7 +47,7 @@
 - [x] Design the database schema for recipes, users, and comments.
 - [x] Implement user authentication and authorization.
 - [ ] Create RESTful API endpoints for recipe CRUD operations.
-- [ ] Write unit tests for the backend functionality.
+- [x] Write unit tests for the backend functionality.
 - [ ] Implement API endpoints for user actions like saving favorites and leaving comments.
 - [ ] Add validation and error handling to the API endpoints.
 - [ ] Create indexes and optimize queries for performance.
@@ -69,4 +74,3 @@
 - [ ] Set up email notifications for user activities (e.g., recipe comments, account verification).
 - [ ] Develop a recipe recommendation engine based on user preferences.
 - [ ] Implement real-time chat functionality between users.
-

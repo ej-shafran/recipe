@@ -41,13 +41,13 @@
     key as FormKey<ToErrors<Values>>
   ) as ToErrors<Values>;
   let value = getIn($store.values, key);
-  const unsubscribe = store.subscribe((form) => {
-    touched = getIn(form.touched, key) as boolean;
+  const unsubscribe = store.subscribe((store) => {
+    touched = getIn(store.touched, key) as boolean;
     error = getIn(
-      form.errors,
+      store.errors,
       key as FormKey<ToErrors<Values>>
     ) as ToErrors<Values>;
-    value = getIn(form.values, key);
+    value = getIn(store.values, key);
   });
   onDestroy(unsubscribe);
 
@@ -68,12 +68,14 @@
     node.setAttribute("id", id);
     node.addEventListener("blur", updateTouched);
     node.addEventListener("input", updateValue);
+    node.dataset.cy = key.join("_").toUpperCase();
 
     return {
       destroy() {
         node.removeAttribute("id");
         node.removeEventListener("blur", updateTouched);
         node.removeEventListener("input", updateValue);
+        delete node.dataset.cy;
       },
     };
   };
@@ -90,7 +92,7 @@
     <input use:attributes />
   </slot>
 
-  <span>
+  <span data-cy={[...key, "error"].join("_").toUpperCase()}>
     {#if touched && error}
       {error._errors?.join(", ")}
     {/if}
