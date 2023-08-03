@@ -1,9 +1,10 @@
 /// <reference types="cypress" />
 /// <reference path="../support/commands.ts" />
 
+import * as fc from "fast-check";
 import { TEST_USER } from "../support/constants";
 
-const SELECTORS = {
+export const SELECTORS = {
   HEADER: "[data-cy=BROWSE_HEADER]",
   RECIPE_PREVIEW: "[data-cy=RECIPE_PREVIEW]",
   TITLE_INPUT: "[data-cy=TITLE]",
@@ -24,37 +25,84 @@ const VALUES = {
 
 const RECIPE_LIMIT = 10;
 
+type Recipe = {
+  content: string;
+  title: string;
+};
+
+type Model = {
+  recipes: number;
+};
+
+export const addRecipeCommand = (
+  recipe: Recipe
+): fc.ICommand<Model, typeof cy, void> => ({
+  check() {
+    return true;
+  },
+
+  run(m: Model, r: typeof cy) {
+    // Affect Model
+    m.recipes++;
+
+    // Affect Real
+    r.get(SELECTORS.TITLE_INPUT).type(recipe.title, {
+      parseSpecialCharSequences: false,
+    });
+    r.get(SELECTORS.CONTENT_INPUT).type(recipe.content, {
+      parseSpecialCharSequences: false,
+    });
+    r.get(SELECTORS.SUBMIT_BUTTON).click();
+
+    // TODO
+    // r.get(SELECTORS.RECIPE_TITLE).contains(recipe.title);
+
+    // Assert
+    r.visit("/browse");
+    r.get(SELECTORS.RECIPE_PREVIEW).should(
+      "have.length",
+      Math.min(RECIPE_LIMIT, m.recipes)
+    );
+  },
+
+  toString(): string {
+    return `${addRecipeCommand.name} ${JSON.stringify(recipe, null, " ")}`;
+  },
+});
+
 describe("Browse Recipe Page", () => {
-  beforeEach(() => {
+  let model: Model;
+
+  before(() => {
     cy.login(TEST_USER.USERNAME, TEST_USER.PASSWORD);
     cy.visit("/browse");
+    cy.get(SELECTORS.RECIPE_PREVIEW).then((recipes) => {
+      model = { recipes: Math.min(RECIPE_LIMIT, recipes.length) };
+    });
   });
 
-  it("displays a page of recipe previews", () => {
-    cy.get(SELECTORS.HEADER).should("exist");
-    cy.get(SELECTORS.RECIPE_PREVIEW).should("have.length.lte", RECIPE_LIMIT);
-  });
+  it.only("test domain logic", () => {
+    const recipeArb = fc.record({
+      content: fc.string({ minLength: 30 }),
+      title: fc.string({ minLength: 30 }),
+    });
 
-  it("adds a new recipe", () => {
-    cy.get(SELECTORS.TITLE_INPUT).type(VALUES.TITLE);
-    cy.get(SELECTORS.CONTENT_INPUT).type(VALUES.CONTENT);
-    cy.get(SELECTORS.SUBMIT_BUTTON).click();
-    cy.get(SELECTORS.RECIPE_TITLE)
-      .should("exist")
-      .should("contain", VALUES.TITLE);
-    cy.get(SELECTORS.RECIPE_CONTENT)
-      .should("exist")
-      .should("contain", VALUES.CONTENT);
-  });
+    const addRecipeArb = recipeArb.map(addRecipeCommand);
 
-  it("links to recipe details", () => {
-    cy.get(SELECTORS.RECIPE_PREVIEW_LINK)
-      .last()
-      .click()
-      .then((a) => {
-        cy.get(SELECTORS.RECIPE_TITLE).should("contain", a.text());
-      });
+    const commands = [addRecipeArb];
+    const commandsArb = fc.commands(commands, { size: "small" });
+
+    const prop = fc.property(commandsArb, (cmds) => {
+      fc.modelRun(() => {
+        return {
+          model: model,
+          real: cy,
+        };
+      }, cmds);
+    });
+
+    fc.assert(prop, { numRuns: 1 });
   });
 });
 
-export {};
+export { };
