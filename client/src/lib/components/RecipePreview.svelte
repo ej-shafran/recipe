@@ -36,7 +36,7 @@
     <p>Comments: <span>{recipePreview.commentCount}</span></p>
 
     {#if recipePreview.poster.id === userId}
-      <button on:click={() => $mutation.mutate()}>Delete</button>
+      <button data-cy="DELETE_PREVIEW" on:click={() => $mutation.mutate()}>Delete</button>
     {/if}
   </div>
 {/if}

@@ -14,13 +14,8 @@ export const SELECTORS = {
   RECIPE_TITLE: "[data-cy=RECIPE_TITLE]",
   RECIPE_CONTENT: "[data-cy=RECIPE_CONTENT]",
   RECIPE_PREVIEW_LINK: "[data-cy=RECIPE_PREVIEW] a",
-};
-
-const VALUES = {
-  TITLE:
-    "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
-  CONTENT:
-    "Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod.",
+  DELETE_PREVIEW: "[data-cy=DELETE_PREVIEW]",
+  LOADING: "[data-cy=LOADING]",
 };
 
 const RECIPE_LIMIT = 10;
@@ -32,16 +27,17 @@ type Recipe = {
 
 type Model = {
   recipes: number;
+  deleteButtons: number;
 };
 
-export const addRecipeCommand = (
+const addRecipeCommand = (
   recipe: Recipe
 ): fc.ICommand<Model, typeof cy, void> => ({
   check() {
     return true;
   },
 
-  run(m: Model, r: typeof cy) {
+  run(m, r) {
     // Affect Model
     m.recipes++;
 
@@ -54,10 +50,8 @@ export const addRecipeCommand = (
     });
     r.get(SELECTORS.SUBMIT_BUTTON).click();
 
-    // TODO
-    // r.get(SELECTORS.RECIPE_TITLE).contains(recipe.title);
-
     // Assert
+    r.get(SELECTORS.RECIPE_TITLE).contains(recipe.title);
     r.visit("/browse");
     r.get(SELECTORS.RECIPE_PREVIEW).should(
       "have.length",
@@ -66,43 +60,80 @@ export const addRecipeCommand = (
   },
 
   toString(): string {
-    return `${addRecipeCommand.name} ${JSON.stringify(recipe, null, " ")}`;
+    return `AddRecipe ${JSON.stringify(recipe, null, " ")}`;
+  },
+});
+
+const deleteRecipeCommand = (
+  i: number
+): fc.ICommand<Model, typeof cy, void> => ({
+  check(m) {
+    return i < m.deleteButtons;
+  },
+  run(m, r) {
+    // Affect Model
+    if (m.recipes < RECIPE_LIMIT) {
+      m.recipes--;
+      m.deleteButtons--;
+    }
+
+    // Affect Real
+    r.get(SELECTORS.DELETE_PREVIEW).then((buttons) => buttons[i].click());
+
+    // Assert
+    if (m.recipes >= 10) {
+      r.get(SELECTORS.RECIPE_PREVIEW).should("have.length.within", 9, 10);
+
+      m.recipes = r.$$(SELECTORS.RECIPE_PREVIEW).length;
+      m.deleteButtons = r.$$(SELECTORS.DELETE_PREVIEW).length;
+    } else {
+      r.get(SELECTORS.RECIPE_PREVIEW).should("have.length", m.recipes);
+    }
+  },
+  toString() {
+    return `DeleteRecipe (${i})`;
   },
 });
 
 describe("Browse Recipe Page", () => {
   let model: Model;
-
   before(() => {
     cy.login(TEST_USER.USERNAME, TEST_USER.PASSWORD);
     cy.visit("/browse");
-    cy.get(SELECTORS.RECIPE_PREVIEW).then((recipes) => {
-      model = { recipes: Math.min(RECIPE_LIMIT, recipes.length) };
-    });
+    cy.get(SELECTORS.LOADING)
+      .should("not.exist")
+      .then(() => {
+        model = {
+          recipes: cy.$$(SELECTORS.RECIPE_PREVIEW).length,
+          deleteButtons: cy.$$(SELECTORS.DELETE_PREVIEW).length,
+        };
+      });
   });
 
-  it.only("test domain logic", () => {
+  it("test domain logic", () => {
     const recipeArb = fc.record({
       content: fc.string({ minLength: 30 }),
       title: fc.string({ minLength: 30 }),
     });
 
     const addRecipeArb = recipeArb.map(addRecipeCommand);
+    const deleteRecipeArb = fc
+      .integer({ min: 1, max: model.deleteButtons })
+      .map(deleteRecipeCommand);
 
-    const commands = [addRecipeArb];
-    const commandsArb = fc.commands(commands, { size: "small" });
+    const commands = [addRecipeArb, deleteRecipeArb];
+    const commandsArb = fc.commands(commands);
 
     const prop = fc.property(commandsArb, (cmds) => {
-      fc.modelRun(() => {
-        return {
-          model: model,
+      fc.modelRun(
+        () => ({
+          model,
           real: cy,
-        };
-      }, cmds);
+        }),
+        cmds
+      );
     });
 
     fc.assert(prop, { numRuns: 1 });
   });
 });
-
-export { };
