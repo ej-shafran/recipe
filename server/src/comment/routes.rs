@@ -3,7 +3,7 @@ use rocket::{http::Status, serde::json::Json, Route};
 use rocket_db_pools::Connection;
 
 pub fn index() -> Vec<Route> {
-    routes![post, get]
+    routes![post, get, delete]
 }
 
 #[post("/<recipe_id>", data = "<comment>")]
@@ -30,4 +30,13 @@ pub async fn get(
     super::read_many(recipe_id, page, limit, &mut db)
         .await
         .map(Json::from)
+}
+
+#[delete("/<comment_id>")]
+pub async fn delete(
+    comment_id: u64,
+    _user: auth::UserID,
+    mut db: Connection<DB>,
+) -> Result<(), Status> {
+    super::delete_one(comment_id, &mut db).await
 }

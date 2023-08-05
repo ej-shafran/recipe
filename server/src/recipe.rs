@@ -126,6 +126,7 @@ pub async fn read_previews(
     })
 }
 
+// TODO: ensure correct user
 pub async fn delete_one(id: u64, db: &mut PoolConnection<MySql>) -> Result<(), Status> {
     let query = sqlx::query!("DELETE FROM recipe WHERE id = ?", id);
 
