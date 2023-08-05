@@ -2,11 +2,7 @@
 /// <reference path="../support/commands.ts" />
 
 import * as fc from "fast-check";
-
-type User = {
-  username: string;
-  password: string;
-};
+import { fakeUser, fakerToArb } from "../support/fake";
 
 const FORM = "[data-cy=REGISTER_FORM]";
 
@@ -30,10 +26,7 @@ const INVALID_CREDENTIALS = "Invalid credentials. Please try again.";
 
 describe("Register Page", () => {
   it("should properly create users in the database", () => {
-    const userArb = fc.record<User>({
-      username: fc.base64String({ minLength: 20, maxLength: 30 }),
-      password: fc.base64String({ minLength: 20 }),
-    });
+    const userArb = fakerToArb(fakeUser);
 
     const prop = fc.property(userArb, (user) => {
       fillInForm(user);

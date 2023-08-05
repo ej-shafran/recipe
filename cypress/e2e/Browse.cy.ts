@@ -2,7 +2,7 @@
 /// <reference path="../support/commands.ts" />
 
 import * as fc from "fast-check";
-import { TEST_USER } from "../support/constants";
+import { fakeUser } from "../support/fake";
 
 export const SELECTORS = {
   HEADER: "[data-cy=BROWSE_HEADER]",
@@ -98,7 +98,9 @@ const deleteRecipeCommand = (
 describe("Browse Recipe Page", () => {
   let model: Model;
   before(() => {
-    cy.login(TEST_USER.USERNAME, TEST_USER.PASSWORD);
+    const user = fakeUser();
+    cy.request("POST", "/api/user/register", user);
+    cy.login(user.username, user.password);
     cy.visit("/browse");
     cy.get(SELECTORS.LOADING)
       .should("not.exist")
@@ -118,11 +120,11 @@ describe("Browse Recipe Page", () => {
 
     const addRecipeArb = recipeArb.map(addRecipeCommand);
     const deleteRecipeArb = fc
-      .integer({ min: 1, max: model.deleteButtons })
+      .integer({ min: 0, max: model.deleteButtons })
       .map(deleteRecipeCommand);
 
     const commands = [addRecipeArb, deleteRecipeArb];
-    const commandsArb = fc.commands(commands);
+    const commandsArb = fc.commands(commands, { size: "+1" });
 
     const prop = fc.property(commandsArb, (cmds) => {
       fc.modelRun(
