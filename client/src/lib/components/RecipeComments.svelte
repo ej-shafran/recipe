@@ -55,7 +55,7 @@
   <NewComment {id} />
 
   {#each $query.data.pages.flatMap((page) => page.results) as comment}
-    <CommentPreview {comment} />
+    <CommentPreview {comment} recipeId={id} />
   {/each}
 
   <div bind:this={bottomOfList} />

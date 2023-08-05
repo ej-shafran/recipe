@@ -7,8 +7,8 @@
   import { getUserId } from "../common/functions/auth.functions";
 
   export let recipePreview: RecipePreviewDTO;
-  const userId = getUserId();
 
+  const userId = getUserId();
   const queryClient = useQueryClient();
 
   const mutation = createMutation({
