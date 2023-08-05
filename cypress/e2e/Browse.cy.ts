@@ -14,7 +14,7 @@ export const SELECTORS = {
   RECIPE_TITLE: "[data-cy=RECIPE_TITLE]",
   RECIPE_CONTENT: "[data-cy=RECIPE_CONTENT]",
   RECIPE_PREVIEW_LINK: "[data-cy=RECIPE_PREVIEW] a",
-  DELETE_PREVIEW: "[data-cy=DELETE_PREVIEW]",
+  DELETE_RECIPE: "[data-cy=DELETE_RECIPE]",
   LOADING: "[data-cy=LOADING]",
 };
 
@@ -78,14 +78,14 @@ const deleteRecipeCommand = (
     }
 
     // Affect Real
-    r.get(SELECTORS.DELETE_PREVIEW).then((buttons) => buttons[i].click());
+    r.get(SELECTORS.DELETE_RECIPE).then((buttons) => buttons[i].click());
 
     // Assert
-    if (m.recipes >= 10) {
-      r.get(SELECTORS.RECIPE_PREVIEW).should("have.length.within", 9, 10);
+    if (m.recipes >= RECIPE_LIMIT) {
+      r.get(SELECTORS.RECIPE_PREVIEW).should("have.length.within", RECIPE_LIMIT - 1, RECIPE_LIMIT);
 
       m.recipes = r.$$(SELECTORS.RECIPE_PREVIEW).length;
-      m.deleteButtons = r.$$(SELECTORS.DELETE_PREVIEW).length;
+      m.deleteButtons = r.$$(SELECTORS.DELETE_RECIPE).length;
     } else {
       r.get(SELECTORS.RECIPE_PREVIEW).should("have.length", m.recipes);
     }
@@ -107,7 +107,7 @@ describe("Browse Recipe Page", () => {
       .then(() => {
         model = {
           recipes: cy.$$(SELECTORS.RECIPE_PREVIEW).length,
-          deleteButtons: cy.$$(SELECTORS.DELETE_PREVIEW).length,
+          deleteButtons: cy.$$(SELECTORS.DELETE_RECIPE).length,
         };
       });
   });
