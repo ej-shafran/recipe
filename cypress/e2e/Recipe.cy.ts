@@ -1,4 +1,5 @@
-import { TEST_USER } from "../support/constants";
+import * as fc from "fast-check";
+import { fakeUser } from "../support/fake";
 
 const SELECTORS = {
   RECIPE_PREVIEW_LINK: "[data-cy=RECIPE_PREVIEW] a",
@@ -10,24 +11,34 @@ const SELECTORS = {
 const RECIPE_URL_REGEX = /\/recipe\/\d+/;
 const COMMENT_LIMIT = 10;
 
-function randomComment() {
-  return crypto.randomUUID();
-}
+const user = fakeUser();
 
 describe("Recipe details page", () => {
+  before(() => {
+    cy.request("POST", "/api/user/register", user);
+    cy.login(user.username, user.password);
+  });
+
   it("shows comments and allows adding them", () => {
-    cy.login(TEST_USER.USERNAME, TEST_USER.PASSWORD);
-    cy.visit("/browse");
+    const commentArb = fc.string({ minLength: 10 });
 
-    cy.get(SELECTORS.RECIPE_PREVIEW_LINK).first().click();
-    cy.url().should("match", RECIPE_URL_REGEX);
+    const prop = fc.property(commentArb, (comment) => {
+      cy.get(SELECTORS.RECIPE_PREVIEW_LINK).first().click();
+      cy.url().should("match", RECIPE_URL_REGEX);
 
-    const comment = randomComment();
-    cy.get(SELECTORS.COMMENTS).should("have.length.lte", COMMENT_LIMIT);
-    cy.get(SELECTORS.NEW_COMMENT_INPUT).type(comment);
-    cy.get(SELECTORS.SUBMIT_BUTTON).click();
+      cy.get(SELECTORS.COMMENTS).should("have.length.lte", COMMENT_LIMIT);
+      cy.get(SELECTORS.NEW_COMMENT_INPUT).type(comment, {
+        parseSpecialCharSequences: false,
+      });
+      cy.get(SELECTORS.SUBMIT_BUTTON).click();
 
-    cy.get(SELECTORS.COMMENTS).should("contain", TEST_USER.USERNAME);
-    cy.get(SELECTORS.COMMENTS).should("contain", comment);
+      cy.get(SELECTORS.COMMENTS).should("contain", user.username);
+      cy.get(SELECTORS.COMMENTS).should("contain", comment);
+    });
+
+    fc.assert(
+      prop.beforeEach(() => cy.visit("/browse")),
+      { numRuns: 5 }
+    );
   });
 });
