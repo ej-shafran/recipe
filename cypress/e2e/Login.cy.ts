@@ -3,7 +3,7 @@
 
 import { faker } from "@faker-js/faker";
 import { fakeUser, unbiasedInt } from "../support/fake";
-import fc from "fast-check";
+import * as fc from "fast-check";
 
 const FORM = "[data-cy=LOGIN_FORM]";
 
