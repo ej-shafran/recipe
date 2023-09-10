@@ -6,7 +6,8 @@
   "scripts": {
     "server": "cd server; cargo run",
     "client": "cd client; npm run dev",
-    "cy:open": "npx cypress open"
+    "cy:open": "npx cypress open",
+    "cy:run": "npx cypress run"
   },
   "dependencies": {
     "cypress": "^12.16.0",

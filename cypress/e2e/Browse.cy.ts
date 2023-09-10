@@ -38,6 +38,9 @@ const addRecipeCommand = (
   },
 
   run(m, r) {
+    // Log
+    r.log(this.toString());
+
     // Affect Model
     m.recipes++;
 
@@ -60,7 +63,7 @@ const addRecipeCommand = (
   },
 
   toString(): string {
-    return `AddRecipe ${JSON.stringify(recipe, null, " ")}`;
+    return `AddRecipe (${JSON.stringify(recipe)})`;
   },
 });
 
@@ -71,6 +74,9 @@ const deleteRecipeCommand = (
     return i < m.deleteButtons;
   },
   run(m, r) {
+    // Log
+    r.log(this.toString());
+
     // Affect Model
     if (m.recipes < RECIPE_LIMIT) {
       m.recipes--;
@@ -120,7 +126,7 @@ describe("Browse Recipe Page", () => {
 
     const addRecipeArb = recipeArb.map(addRecipeCommand);
     const deleteRecipeArb = fc
-      .integer({ min: 0, max: model.deleteButtons })
+      .nat({ max: 200 })
       .map(deleteRecipeCommand);
 
     const commands = [addRecipeArb, deleteRecipeArb];
