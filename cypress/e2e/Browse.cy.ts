@@ -32,7 +32,7 @@ type Model = {
 
 let model: Model;
 
-type Command = fc.ICommand<Model, never, void>;
+type Command = fc.ICommand<Model, typeof cy, void>;
 
 function AddRecipe(recipe: Recipe): Command {
   return {
@@ -42,9 +42,9 @@ function AddRecipe(recipe: Recipe): Command {
     toString() {
       return `AddRecipe (${JSON.stringify(recipe)})`;
     },
-    run(m) {
+    run(m, r) {
       // Log
-      cy.log(this.toString());
+      r.log(this.toString());
 
       // Affect model
       m.recipes++;
@@ -52,17 +52,17 @@ function AddRecipe(recipe: Recipe): Command {
       model = m;
 
       // Affect real
-      cy.get(SELECTORS.TITLE_INPUT).type(recipe.title, {
+      r.get(SELECTORS.TITLE_INPUT).type(recipe.title, {
         parseSpecialCharSequences: false,
         log: false,
       });
-      cy.get(SELECTORS.CONTENT_INPUT).type(recipe.content, {
+      r.get(SELECTORS.CONTENT_INPUT).type(recipe.content, {
         parseSpecialCharSequences: false,
         log: false,
       });
-      cy.get(SELECTORS.SUBMIT_BUTTON).click();
-      cy.visit("/browse");
-      cy.get(SELECTORS.LOADING).should("not.exist");
+      r.get(SELECTORS.SUBMIT_BUTTON).click();
+      r.visit("/browse");
+      r.get(SELECTORS.LOADING).should("not.exist");
     },
   };
 }
@@ -74,9 +74,9 @@ const DeleteRecipe: Command = {
   toString() {
     return "DeleteRecipe";
   },
-  run(m) {
+  run(m, r) {
     // Log
-    cy.log(this.toString());
+    r.log(this.toString());
 
     // Affect model
     m.recipes--;
@@ -84,7 +84,7 @@ const DeleteRecipe: Command = {
     model = m;
 
     // Affect real
-    cy.get(SELECTORS.DELETE_RECIPE).then((deleteButtons) => {
+    r.get(SELECTORS.DELETE_RECIPE).then((deleteButtons) => {
       const button = faker.helpers.arrayElement(deleteButtons.toArray());
       button.click();
     });
@@ -119,7 +119,7 @@ describe("Browse Recipe Page", () => {
     ];
 
     const prop = fc.property(fc.commands(commands), (cmds) => {
-      fc.modelRun(() => ({ model, real: undefined }), cmds);
+      fc.modelRun(() => ({ model, real: cy }), cmds);
 
       cy.wait(300);
       cy.request("GET", "/api/recipe/count").then((response) => {
