@@ -32,7 +32,9 @@ type Model = {
 
 let model: Model;
 
-function AddRecipe(recipe: Recipe): fc.ICommand<Model, never, void> {
+type Command = fc.ICommand<Model, never, void>;
+
+function AddRecipe(recipe: Recipe): Command {
   return {
     check() {
       return true;
@@ -65,7 +67,7 @@ function AddRecipe(recipe: Recipe): fc.ICommand<Model, never, void> {
   };
 }
 
-const DeleteRecipe = (): fc.ICommand<Model, never, void> => ({
+const DeleteRecipe: Command = {
   check(m) {
     return m.added > 0;
   },
@@ -87,7 +89,7 @@ const DeleteRecipe = (): fc.ICommand<Model, never, void> => ({
       button.click();
     });
   },
-});
+};
 
 describe("Browse Recipe Page", () => {
   before(() => {
@@ -113,7 +115,7 @@ describe("Browse Recipe Page", () => {
           title: fc.string({ minLength: 30 }),
         })
         .map(AddRecipe),
-      fc.constant(null).map(DeleteRecipe),
+      fc.constant(DeleteRecipe),
     ];
 
     const prop = fc.property(fc.commands(commands), (cmds) => {
