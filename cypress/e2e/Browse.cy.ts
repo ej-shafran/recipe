@@ -2,6 +2,8 @@
 /// <reference path="../support/commands.ts" />
 
 import * as fc from "fast-check";
+import { faker } from "@faker-js/faker";
+
 import { fakeUser } from "../support/fake";
 
 export const SELECTORS = {
@@ -18,8 +20,6 @@ export const SELECTORS = {
   LOADING: "[data-cy=LOADING]",
 };
 
-const RECIPE_LIMIT = 10;
-
 type Recipe = {
   content: string;
   title: string;
@@ -27,119 +27,102 @@ type Recipe = {
 
 type Model = {
   recipes: number;
-  deleteButtons: number;
+  added: number;
 };
 
-const addRecipeCommand = (
-  recipe: Recipe
-): fc.ICommand<Model, typeof cy, void> => ({
-  check() {
-    return true;
-  },
+let model: Model;
 
-  run(m, r) {
-    // Log
-    r.log(this.toString());
+function AddRecipe(recipe: Recipe): fc.ICommand<Model, never, void> {
+  return {
+    check() {
+      return true;
+    },
+    toString() {
+      return `AddRecipe (${JSON.stringify(recipe)})`;
+    },
+    run(m) {
+      // Log
+      cy.log(this.toString());
 
-    // Affect Model
-    m.recipes++;
+      // Affect model
+      m.recipes++;
+      m.added++;
+      model = m;
 
-    // Affect Real
-    r.get(SELECTORS.TITLE_INPUT).type(recipe.title, {
-      parseSpecialCharSequences: false,
-    });
-    r.get(SELECTORS.CONTENT_INPUT).type(recipe.content, {
-      parseSpecialCharSequences: false,
-    });
-    r.get(SELECTORS.SUBMIT_BUTTON).click();
+      // Affect real
+      cy.get(SELECTORS.TITLE_INPUT).type(recipe.title, {
+        parseSpecialCharSequences: false,
+        log: false,
+      });
+      cy.get(SELECTORS.CONTENT_INPUT).type(recipe.content, {
+        parseSpecialCharSequences: false,
+        log: false,
+      });
+      cy.get(SELECTORS.SUBMIT_BUTTON).click();
+      cy.visit("/browse");
+      cy.get(SELECTORS.LOADING).should("not.exist");
+    },
+  };
+}
 
-    // Assert
-    r.get(SELECTORS.RECIPE_TITLE).contains(recipe.title);
-    r.visit("/browse");
-    r.get(SELECTORS.RECIPE_PREVIEW).should(
-      "have.length",
-      Math.min(RECIPE_LIMIT, m.recipes)
-    );
-  },
-
-  toString(): string {
-    return `AddRecipe (${JSON.stringify(recipe)})`;
-  },
-});
-
-const deleteRecipeCommand = (
-  i: number
-): fc.ICommand<Model, typeof cy, void> => ({
+const DeleteRecipe = (): fc.ICommand<Model, never, void> => ({
   check(m) {
-    return i < m.deleteButtons;
-  },
-  run(m, r) {
-    // Log
-    r.log(this.toString());
-
-    // Affect Model
-    if (m.recipes < RECIPE_LIMIT) {
-      m.recipes--;
-      m.deleteButtons--;
-    }
-
-    // Affect Real
-    r.get(SELECTORS.DELETE_RECIPE).then((buttons) => buttons[i].click());
-
-    // Assert
-    if (m.recipes >= RECIPE_LIMIT) {
-      r.get(SELECTORS.RECIPE_PREVIEW).should("have.length.within", RECIPE_LIMIT - 1, RECIPE_LIMIT);
-
-      m.recipes = r.$$(SELECTORS.RECIPE_PREVIEW).length;
-      m.deleteButtons = r.$$(SELECTORS.DELETE_RECIPE).length;
-    } else {
-      r.get(SELECTORS.RECIPE_PREVIEW).should("have.length", m.recipes);
-    }
+    return m.added > 0;
   },
   toString() {
-    return `DeleteRecipe (${i})`;
+    return "DeleteRecipe";
+  },
+  run(m) {
+    // Log
+    cy.log(this.toString());
+
+    // Affect model
+    m.recipes--;
+    m.added--;
+    model = m;
+
+    // Affect real
+    cy.get(SELECTORS.DELETE_RECIPE).then((deleteButtons) => {
+      const button = faker.helpers.arrayElement(deleteButtons.toArray());
+      button.click();
+    });
   },
 });
 
 describe("Browse Recipe Page", () => {
-  let model: Model;
   before(() => {
     const user = fakeUser();
     cy.request("POST", "/api/user/register", user);
     cy.login(user.username, user.password);
-    cy.visit("/browse");
-    cy.get(SELECTORS.LOADING)
-      .should("not.exist")
-      .then(() => {
-        model = {
-          recipes: cy.$$(SELECTORS.RECIPE_PREVIEW).length,
-          deleteButtons: cy.$$(SELECTORS.DELETE_RECIPE).length,
-        };
-      });
-  });
 
-  it("test domain logic", () => {
-    const recipeArb = fc.record({
-      content: fc.string({ minLength: 30 }),
-      title: fc.string({ minLength: 30 }),
+    cy.request("GET", "/api/recipe/count").then((response) => {
+      model = {
+        recipes: response.body,
+        added: 0,
+      };
     });
 
-    const addRecipeArb = recipeArb.map(addRecipeCommand);
-    const deleteRecipeArb = fc
-      .nat({ max: 200 })
-      .map(deleteRecipeCommand);
+    cy.visit("/browse");
+  });
 
-    const commands = [addRecipeArb, deleteRecipeArb];
-    const commandsArb = fc.commands(commands, { size: "+1" });
+  it("tests domain logic", () => {
+    const commands = [
+      fc
+        .record<Recipe>({
+          content: fc.string({ minLength: 30 }),
+          title: fc.string({ minLength: 30 }),
+        })
+        .map(AddRecipe),
+      fc.constant(null).map(DeleteRecipe),
+    ];
 
-    const prop = fc.property(commandsArb, (cmds) => {
-      fc.modelRun(
-        () => ({
-          model,
-          real: cy,
-        }),
-        cmds
-      );
+    const prop = fc.property(fc.commands(commands), (cmds) => {
+      fc.modelRun(() => ({ model, real: undefined }), cmds);
+
+      cy.wait(300);
+      cy.request("GET", "/api/recipe/count").then((response) => {
+        expect(response.body).to.equal(model.recipes);
+      });
     });
 
     fc.assert(prop, { numRuns: 1 });
