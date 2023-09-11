@@ -39,7 +39,7 @@ pub async fn get_details(
 }
 
 #[get("/count")]
-pub async fn get_count(mut db: Connection<DB>/*, _user: auth::UserID*/) -> Result<Json<u32>, Status> {
+pub async fn get_count(mut db: Connection<DB>, _user: auth::UserID) -> Result<Json<u32>, Status> {
     super::read_count(&mut db).await.map(Json::from)
 }
 
