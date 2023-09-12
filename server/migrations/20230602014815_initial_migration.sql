@@ -13,7 +13,7 @@ CREATE TABLE `recipe` (
   user_id varchar(36) NOT NULL,
   created_at timestamp DEFAULT CURRENT_TIMESTAMP,
   -- Recipe >- Many:One -> User (Poster)
-  FOREIGN KEY(user_id) REFERENCES `user`(id)
+  FOREIGN KEY(user_id) REFERENCES `user`(id) ON DELETE CASCADE
 );
 
 -- Recipe >- Many:Many -< User (Saved)
@@ -22,8 +22,8 @@ CREATE TABLE `saves` (
   user_id varchar(36) NOT NULL,
   recipe_id int NOT NULL,
   saved_at timestamp DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY(user_id) REFERENCES `user`(id),
-  FOREIGN KEY(recipe_id) REFERENCES `recipe`(id)
+  FOREIGN KEY(user_id) REFERENCES `user`(id) ON DELETE CASCADE,
+  FOREIGN KEY(recipe_id) REFERENCES `recipe`(id) ON DELETE CASCADE
 );
 
 -- Comment Table

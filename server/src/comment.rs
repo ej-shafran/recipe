@@ -106,3 +106,14 @@ pub async fn read_many(
         },
     })
 }
+
+// TODO: ensure correct user
+pub async fn delete_one(id: u64, db: &mut PoolConnection<MySql>) -> Result<(), Status> {
+    let query = sqlx::query!("DELETE FROM comment WHERE id = ?", id);
+
+    match query.execute(&mut *db).await {
+        Ok(_) => Ok(()),
+        Err(sqlx::Error::RowNotFound) => Err(Status::NotFound),
+        Err(_) => Err(Status::InternalServerError),
+    }
+}

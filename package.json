@@ -6,7 +6,8 @@
   "scripts": {
     "server": "cd server; cargo run",
     "client": "cd client; npm run dev",
-    "cy:open": "npx cypress open"
+    "cy:open": "npx cypress open",
+    "cy:run": "npx cypress run"
   },
   "dependencies": {
     "cypress": "^12.16.0",
@@ -15,5 +16,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@faker-js/faker": "^8.0.2",
+    "fast-check": "^3.12.0"
+  }
 }

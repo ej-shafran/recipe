@@ -95,7 +95,7 @@ pub async fn read_previews(
         .await
         .or(Err(Status::InternalServerError))?;
 
-    let query = sqlx::query!("SELECT COUNT(id) AS `count: u32` FROM recipe;");
+    let query = sqlx::query!("SELECT COUNT(*) AS `count: u32` FROM recipe;");
 
     let count = query
         .fetch_one(&mut transaction)
@@ -126,6 +126,18 @@ pub async fn read_previews(
     })
 }
 
+pub async fn read_count(
+    db: &mut PoolConnection<MySql>,
+) -> Result<u32, Status> {
+    let query = sqlx::query!("SELECT COUNT(*) as `count: u32` FROM recipe;");
+
+    query.fetch_one(&mut *db)
+        .await
+        .map_err(|_| Status::InternalServerError)
+        .map(|result| result.count)
+}
+
+// TODO: ensure correct user
 pub async fn delete_one(id: u64, db: &mut PoolConnection<MySql>) -> Result<(), Status> {
     let query = sqlx::query!("DELETE FROM recipe WHERE id = ?", id);
 

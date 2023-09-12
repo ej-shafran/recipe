@@ -1,9 +1,12 @@
 /// <reference types="cypress" />
 /// <reference path="../support/commands.ts" />
 
-import { TEST_USER } from "../support/constants";
+import * as fc from "fast-check";
+import { faker } from "@faker-js/faker";
 
-const SELECTORS = {
+import { fakeUser } from "../support/fake";
+
+export const SELECTORS = {
   HEADER: "[data-cy=BROWSE_HEADER]",
   RECIPE_PREVIEW: "[data-cy=RECIPE_PREVIEW]",
   TITLE_INPUT: "[data-cy=TITLE]",
@@ -13,48 +16,117 @@ const SELECTORS = {
   RECIPE_TITLE: "[data-cy=RECIPE_TITLE]",
   RECIPE_CONTENT: "[data-cy=RECIPE_CONTENT]",
   RECIPE_PREVIEW_LINK: "[data-cy=RECIPE_PREVIEW] a",
+  DELETE_RECIPE: "[data-cy=DELETE_RECIPE]",
+  LOADING: "[data-cy=LOADING]",
 };
 
-const VALUES = {
-  TITLE:
-    "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
-  CONTENT:
-    "Lorem ipsum dolor sit amet, officia excepteur ex fugiat reprehenderit enim labore culpa sint ad nisi Lorem pariatur mollit ex esse exercitation amet. Nisi anim cupidatat excepteur officia. Reprehenderit nostrud nostrud ipsum Lorem est aliquip amet voluptate voluptate dolor minim nulla est proident. Nostrud officia pariatur ut officia. Sit irure elit esse ea nulla sunt ex occaecat reprehenderit commodo officia dolor Lorem duis laboris cupidatat officia voluptate. Culpa proident adipisicing id nulla nisi laboris ex in Lorem sunt duis officia eiusmod.",
+type Recipe = {
+  content: string;
+  title: string;
 };
 
-const RECIPE_LIMIT = 10;
+type Model = {
+  recipes: number;
+  added: number;
+};
+
+let model: Model;
+
+type Command = fc.ICommand<Model, typeof cy, void>;
+
+function AddRecipe(recipe: Recipe): Command {
+  return {
+    check() {
+      return true;
+    },
+    toString() {
+      return `AddRecipe (${JSON.stringify(recipe)})`;
+    },
+    run(m, r) {
+      // Log
+      r.log(this.toString());
+
+      // Affect model
+      m.recipes++;
+      m.added++;
+      model = m;
+
+      // Affect real
+      r.get(SELECTORS.TITLE_INPUT).type(recipe.title, {
+        parseSpecialCharSequences: false,
+        log: false,
+      });
+      r.get(SELECTORS.CONTENT_INPUT).type(recipe.content, {
+        parseSpecialCharSequences: false,
+        log: false,
+      });
+      r.get(SELECTORS.SUBMIT_BUTTON).click();
+      r.visit("/browse");
+      r.get(SELECTORS.LOADING).should("not.exist");
+    },
+  };
+}
+
+const DeleteRecipe: Command = {
+  check(m) {
+    return m.added > 0;
+  },
+  toString() {
+    return "DeleteRecipe";
+  },
+  run(m, r) {
+    // Log
+    r.log(this.toString());
+
+    // Affect model
+    m.recipes--;
+    m.added--;
+    model = m;
+
+    // Affect real
+    r.get(SELECTORS.DELETE_RECIPE).then((deleteButtons) => {
+      const button = faker.helpers.arrayElement(deleteButtons.toArray());
+      button.click();
+    });
+  },
+};
 
 describe("Browse Recipe Page", () => {
-  beforeEach(() => {
-    cy.login(TEST_USER.USERNAME, TEST_USER.PASSWORD);
+  before(() => {
+    const user = fakeUser();
+    cy.request("POST", "/api/user/register", user);
+    cy.login(user.username, user.password);
+
+    cy.request("GET", "/api/recipe/count").then((response) => {
+      model = {
+        recipes: response.body,
+        added: 0,
+      };
+    });
+
     cy.visit("/browse");
   });
 
-  it("displays a page of recipe previews", () => {
-    cy.get(SELECTORS.HEADER).should("exist");
-    cy.get(SELECTORS.RECIPE_PREVIEW).should("have.length.lte", RECIPE_LIMIT);
-  });
+  it("tests domain logic", () => {
+    const commands = [
+      fc
+        .record<Recipe>({
+          content: fc.string({ minLength: 30 }),
+          title: fc.string({ minLength: 30 }),
+        })
+        .map(AddRecipe),
+      fc.constant(DeleteRecipe),
+    ];
 
-  it("adds a new recipe", () => {
-    cy.get(SELECTORS.TITLE_INPUT).type(VALUES.TITLE);
-    cy.get(SELECTORS.CONTENT_INPUT).type(VALUES.CONTENT);
-    cy.get(SELECTORS.SUBMIT_BUTTON).click();
-    cy.get(SELECTORS.RECIPE_TITLE)
-      .should("exist")
-      .should("contain", VALUES.TITLE);
-    cy.get(SELECTORS.RECIPE_CONTENT)
-      .should("exist")
-      .should("contain", VALUES.CONTENT);
-  });
+    const prop = fc.property(fc.commands(commands), (cmds) => {
+      fc.modelRun(() => ({ model, real: cy }), cmds);
 
-  it("links to recipe details", () => {
-    cy.get(SELECTORS.RECIPE_PREVIEW_LINK)
-      .last()
-      .click()
-      .then((a) => {
-        cy.get(SELECTORS.RECIPE_TITLE).should("contain", a.text());
+      cy.wait(300);
+      cy.request("GET", "/api/recipe/count").then((response) => {
+        expect(response.body).to.equal(model.recipes);
       });
+    });
+
+    fc.assert(prop, { numRuns: 1 });
   });
 });
-
-export {};

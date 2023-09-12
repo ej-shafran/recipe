@@ -10,6 +10,7 @@ mod tests;
 
 pub mod routes;
 
+// TODO: add checks for length
 #[derive(Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct UserDTO {

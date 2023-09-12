@@ -1,1 +1,1 @@
-<div>Loading...</div>
+<div data-cy="LOADING">Loading...</div>
