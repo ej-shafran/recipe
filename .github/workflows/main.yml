@@ -80,8 +80,8 @@ jobs:
       with:
         wait-on: 'http://127.0.0.1:8000'
         start: |
-          pnpm server
-          pnpm client -- --logLevel=silent
+          npm run server
+          npm run client -- --logLevel=silent
           
     - name: Compile (Client)
       run: npm run check
